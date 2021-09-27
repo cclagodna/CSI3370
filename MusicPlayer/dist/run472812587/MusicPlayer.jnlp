@@ -8,8 +8,8 @@
     <update check="always"/>
     <resources>
         <j2se version="10.0.2+" href="http://java.sun.com/products/autodl/j2se"/>
-        <jar href="MusicPlayer.jar" size="3235" download="eager"/>
+        <jar href="MusicPlayer.jar" size="2620" download="eager"/>
     </resources>
-    <jfx:javafx-desc width="800" height="600" main-class="javafxapplication5.Main" name="Main"/>
+    <jfx:javafx-desc width="800" height="600" main-class="javafxapplication5.JavaFXApplication5" name="JavaFXApplication5"/>
 </jnlp>
 
