@@ -34,5 +34,19 @@ public class Playlist
         this.name = name;
     }
     
+    public void addSong(Song s) {
+        if (!playlist.contains(s)) {
+            playlist.add(s);
+        }
+    }
     
+    public void removeSong(Song s) {
+        if (playlist.contains(s)) {
+            playlist.remove(s);
+        }
+    }
+    
+    public boolean hasSong(Song s) {
+        return playlist.contains(s);
+    }
 }
