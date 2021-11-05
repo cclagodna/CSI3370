@@ -54,9 +54,13 @@ public class Song
         this.albumName = albumName;
     }
     
-    public boolean checkFileLocation(File f) 
+    public boolean checkFileLocation(File f) {
+        return f.exists();
+    }
+    
+    // TODO: Implement this function that creates a JSON file filled with Songs MetaData Values
+    public void createJSONFile() 
     {
-        boolean exists = f.exists();
-        return exists;
+        
     }
 }
