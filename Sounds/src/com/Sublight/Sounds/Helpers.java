@@ -15,7 +15,6 @@ import java.util.logging.Logger;
  */
 public class Helpers 
 {
-
     /* Use this function when wanting to move a selected file to a target directory.
     */
     public static boolean upload(File origFile, String newLoc) 
