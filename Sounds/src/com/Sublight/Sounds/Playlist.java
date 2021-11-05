@@ -9,9 +9,10 @@ import java.util.ArrayList;
 public class Playlist 
 {
 
-    private ArrayList<Song> playlist;
-    private String name;
+    private ArrayList<Song> playlist; // arrayList for speicified playlist
+    private String name; // name for specified Playlist
     
+    // Playlist constructor
     public Playlist(String playlistName) 
     {
         this.playlist = new ArrayList<Song>();
@@ -49,4 +50,12 @@ public class Playlist
     public boolean hasSong(Song s) {
         return playlist.contains(s);
     }
+    
+    /*
+    Add function to make a (Playlist Name).txt file that contains all the Song locations.
+    */
+    
+    /*
+    Add a function that loads all playlists at the beginning of the programs runtime.
+    */
 }
