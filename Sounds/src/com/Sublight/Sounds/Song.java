@@ -44,7 +44,7 @@ public class Song
         return albumName;
     }
 
-    public void setLocation(File location) {
+    public void setmp3Location(File location) {
         this.mp3Location = location;
     }
 
