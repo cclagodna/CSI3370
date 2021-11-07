@@ -1,6 +1,11 @@
 package com.Sublight.Sounds;
 
+import com.google.gson.Gson;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -8,22 +13,23 @@ import java.io.File;
  */
 public class Song 
 {
+    public static String p = System.getProperty("file.separator"); // File Separator
    
-    private File location;
-    private String songName;
-    private String artistName;
-    private String albumName;
+    private File mp3Location; // location of MP3 file for song
+    private String songName; // song name
+    private String artistName; // artist name
+    private String albumName; // album name
     
     public Song(File location, String song, String artist, String album) 
     {
-        this.location = location;
+        this.mp3Location = location;
         this.songName = song;
         this.artistName = artist;
         this.albumName = album;
     }
 
-    public File getLocation() {
-        return location;
+    public File getmp3Location() {
+        return mp3Location;
     }
 
     public String getSongName() {
@@ -39,7 +45,7 @@ public class Song
     }
 
     public void setLocation(File location) {
-        this.location = location;
+        this.mp3Location = location;
     }
 
     public void setSongName(String songName) {
@@ -54,13 +60,50 @@ public class Song
         this.albumName = albumName;
     }
     
-    public boolean checkFileLocation(File f) {
+    // This is checking whether the song MP3 file still exists or not.
+    public boolean checkmp3FileLocation(File f) {
         return f.exists();
     }
     
-    // TODO: Implement this function that creates a JSON file filled with Songs MetaData Values
-    public void createJSONFile() 
+    public static File getJSONLocation(Song s) {
+        String n = s.songName;
+        String a = s.artistName;
+        File f = new File("resources" + p + "SongJSONs" + p + n + "+" + a + ".json"); // specifying where file is stored
+        return f;
+    }
+    
+    // This creates a JSON file with the name "(NameofSong)+(NameofArtist).json"
+    public void createJSONFile(Song s)
     {
-        
+        File f = Song.getJSONLocation(s); // getting file location of JSON
+        Gson gson = new Gson(); // creating a GSON object
+        try {
+            gson.toJson(s, new FileWriter(f)); // write a JSON file in specified location
+            System.out.println("Made a JSON File at " + f.getAbsolutePath());
+        } catch (IOException ex) {
+            Logger.getLogger(Song.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    // This is a function that removes the MP3 from the program, and the JSON associated with it.
+    public void removeSongFiles(Song s) 
+    {
+        File mp3File = s.getmp3Location().getAbsoluteFile();
+        File jsonFile = Song.getJSONLocation(s);
+        String n = s.getSongName();
+        String a = s.getArtistName();
+        if (mp3File.exists()) // if the mp3 file exists, delete it
+        {
+            mp3File.delete();
+            System.out.println(n + " " + a + " MP3 file deleted.");
+        } else { // else it wasn't found
+            System.out.println(n + " " + a + " MP3 not found.");
+        }
+        if (jsonFile.exists()) { // if the JSON file exists, delete it
+            jsonFile.delete();
+            System.out.println(n + " " + a + " JSON file deleted.");
+        } else { // else it wasn't found
+            System.out.println(n + " " + a + " JSON not found.");
+        }
     }
 }
