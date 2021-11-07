@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -77,12 +75,12 @@ public class Song
     {
         File f = Song.getJSONLocation(s); // getting file location of JSON
         Gson gson = new Gson(); // creating a GSON object
-        try {
-            gson.toJson(s, new FileWriter(f)); // write a JSON file in specified location
+        try (FileWriter writer = new FileWriter(f.getAbsolutePath())) 
+        {
+            gson.toJson(s, writer);
             System.out.println("Made a JSON File at " + f.getAbsolutePath());
-        } catch (IOException ex) {
-            Logger.getLogger(Song.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } catch (IOException e) {}
+        
     }
     
     // This is a function that removes the MP3 from the program, and the JSON associated with it.
