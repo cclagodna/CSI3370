@@ -63,6 +63,7 @@ public class Song
         return f.exists();
     }
     
+    // getting the location of the JSON file
     public static File getJSONLocation(Song s) {
         String n = s.songName;
         String a = s.artistName;
@@ -75,10 +76,10 @@ public class Song
     {
         File f = Song.getJSONLocation(s); // getting file location of JSON
         Gson gson = new Gson(); // creating a GSON object
-        try (FileWriter writer = new FileWriter(f.getAbsolutePath())) 
+        try (FileWriter writer = new FileWriter(f.getPath())) 
         {
             gson.toJson(s, writer);
-            System.out.println("Made a JSON File at " + f.getAbsolutePath());
+            System.out.println("Made a JSON File at " + f.getPath());
         } catch (IOException e) {}
         
     }
@@ -87,7 +88,7 @@ public class Song
     public void removeSongFiles(Song s) 
     {
         File mp3File = s.getmp3Location().getAbsoluteFile();
-        File jsonFile = Song.getJSONLocation(s);
+        File jsonFile = Song.getJSONLocation(s).getAbsoluteFile();
         String n = s.getSongName();
         String a = s.getArtistName();
         if (mp3File.exists()) // if the mp3 file exists, delete it

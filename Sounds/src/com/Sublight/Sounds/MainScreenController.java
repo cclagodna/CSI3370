@@ -25,7 +25,6 @@ public class MainScreenController implements Initializable {
     use /, while WindowsOS use \.
     */
     public String p = System.getProperty("file.separator"); 
-    public String uploadSongPath = "resources" + p + "Songs" + p;
     public MusicPlayer musicPlayer;
     public MediaPlayer mp;
     
@@ -90,32 +89,7 @@ public class MainScreenController implements Initializable {
         String artistName = artistNameText.getText();
         String albumName = albumNameText.getText();
         
-        if (f.exists()) 
-        {
-            if (sName != null) 
-            {
-                if (artistName != null) 
-                {
-                    if (albumName != null) 
-                    {
-                        String filepath = uploadSongPath + sName + ".mp3";
-                        File newFileLoc = new File(filepath);
-                        Song s = new Song(newFileLoc, sName, artistName, albumName);
-                        Helpers.upload(f, filepath);
-                        s.createJSONFile(s);
-                        uploadMP3Label.setText("MP3 Uploaded Successfully!");
-                    } else {
-                        uploadMP3Label.setText("No Album specified!");
-                    }
-                } else {
-                    uploadMP3Label.setText("No Artist specified!");
-                }
-            } else {
-                uploadMP3Label.setText("No Song Name specified!");
-            }
-        } else {
-            uploadMP3Label.setText("No MP3 File to upload!");
-        }
+        uploadMP3Label.setText(Helpers.uploadCheck(f, sName, artistName, albumName));
     }
     
 }
