@@ -47,6 +47,8 @@ public class MainScreenController implements Initializable {
         musicPlayer = new MusicPlayer("resources" + p + "rickroll.mp3");
         mp = musicPlayer.getMediaPlayer();
         uploadText.setEditable(false);
+        //playlistOneSong();
+        //playlistTwoSongs();
     }    
 
     // this is the function for the play button
@@ -90,8 +92,26 @@ public class MainScreenController implements Initializable {
         String albumName = albumNameText.getText();
         
         Song s = new Song(f, sName, artistName, albumName);
-        
         uploadMP3Label.setText(Helpers.uploadCheck(s));
+    }
+    
+    
+    public void playlistOneSong() {
+        Playlist p = new Playlist("TestPlaylist");
+        Song s1 = new Song(new File("resources/Songs/Test+123.mp3"), "Test", "123", "abc");
+        p.addSong(s1);
+        p.updateTextFile();
+    }
+    
+    // Result: updateText() won't replace a currently existing PlayList text file with the new copy.
+    public void playlistTwoSongs() 
+    {
+        Song s1 = new Song(new File("resources/Songs/Test+123.mp3"), "Test", "123", "abc");
+        Song s2 = new Song(new File("resources/Songs/Hello+World.mp3"), "Hello", "World", "Java");
+        Playlist p = new Playlist("TestPlaylist");
+        p.addSong(s1);
+        p.addSong(s2);
+        p.updateTextFile();
     }
     
 }

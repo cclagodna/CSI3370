@@ -21,7 +21,7 @@ public class Playlist
 {
     private static ArrayList<ArrayList<Song>> arrayOfAllPlaylists = new ArrayList<ArrayList<Song>>();
     public static String p = System.getProperty("file.separator"); 
-    public String resourcePath = "resources" + p + "Playlists" + p;
+    public String playlistFolderPath = "resources" + p + "Playlists" + p;
     private ArrayList<Song> playlist; // arrayList for specified playlist
     private String name; // name for specified Playlist
     
@@ -76,16 +76,26 @@ public class Playlist
     */
     public void updateTextFile() 
     {
-        File f = new File(resourcePath + this.name + ".txt");
+        File f = new File(playlistFolderPath + this.name + ".txt");
+        // If the file already exists, we want to delete it so we can store new contents to it.
+        if (f.exists() && f.isFile()) {
+            f.delete();
+        }
+        // then we create a new file to the same path.
+        try {
+            f.createNewFile();
+        } catch (IOException ex) {
+            Logger.getLogger(Playlist.class.getName()).log(Level.SEVERE, null, ex);
+        }
         try 
         {
-            FileWriter fr = new FileWriter(f, true);
+            FileWriter fr = new FileWriter(f, false); // creating the writer that will write to the file we create
             if (!playlist.isEmpty()) // if the playlist isn't empty
             {
                 for (Song s : playlist) // for all songs in the playlist
                 {
-                    String songPath = Song.getJSONLocation(s).getAbsolutePath(); // get it's JSON file location
-                    fr.append(songPath + "/n"); // add it to this text file
+                    String songPath = Song.getJSONLocation(s).getPath(); // get it's JSON file location
+                    fr.append(songPath + "\n"); // add it to this text file
                 }
             }
             fr.close(); // close the FileWriter after you're done
