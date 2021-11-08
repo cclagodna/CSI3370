@@ -102,37 +102,39 @@ public class Playlist
         File f = new File("resources" + p + "Playlists");
         if (f.exists() && f.isDirectory()) 
         {
-            File[] dirContents = f.listFiles(); // getting the files of the playlist folder
-            for (int i = 0; i < dirContents.length; i++) // for the amount of files in the playlist folder
+            if (f.length() > 0) 
             {
-                File temp = dirContents[i]; // get the text file at specified index
-                if (temp.isFile()) // if it is a file rather than a directory
+                File[] dirContents = f.listFiles(); // getting the files of the playlist folder
+                for (File temp : dirContents) // for all files in the array
                 {
-                    try 
+                    if (temp.isFile()) // if the file is a file rather than a directory.
                     {
-                        Scanner scan = new Scanner(temp); // Creating a scanner for the text file
-                        Gson gson = new Gson();
-                        ArrayList<Song> tempPlaylist = new ArrayList<Song>();
-                        while (scan.hasNextLine()) // while the text file has more JSON file locations to read
+                        try 
                         {
-                            String filePath = scan.nextLine(); // go to the next line of the textfile
-                            try 
+                            Scanner scan = new Scanner(temp); // Creating a scanner for the text file
+                            Gson gson = new Gson();
+                            ArrayList<Song> tempPlaylist = new ArrayList<Song>();
+                            while (scan.hasNextLine()) // while the text file has more JSON file locations to read
                             {
-                                Reader reader = Files.newBufferedReader(Paths.get(filePath)); // get the JSON File
-                                Song s = gson.fromJson(reader, Song.class); // converting the JSON File into a Song Object.
-                                tempPlaylist.add(s); // adding the song to that playlist
-                            } 
-                            catch (IOException ex) {
-                                Logger.getLogger(Playlist.class.getName()).log(Level.SEVERE, null, ex);
+                                String filePath = scan.nextLine(); // go to the next line of the textfile
+                                try 
+                                {
+                                    Reader reader = Files.newBufferedReader(Paths.get(filePath)); // get the JSON File
+                                    Song s = gson.fromJson(reader, Song.class); // converting the JSON File into a Song Object.
+                                    s.setmp3Location(Helpers.convertFilePath(s.getmp3Location())); // this makes sure the filepath is correct for the OS
+                                    tempPlaylist.add(s); // adding the song to that playlist
+                                }
+                                catch (IOException ex) {
+                                    Logger.getLogger(Playlist.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                             }
+                            arrayOfAllPlaylists.add(tempPlaylist); // adding that arraylist of songs to the list of all playlists.
+                        } catch (FileNotFoundException ex) 
+                        {
+                            Logger.getLogger(Playlist.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        arrayOfAllPlaylists.add(tempPlaylist); // adding that arraylist of songs to the list of all playlists.
-                    } catch (FileNotFoundException ex) 
-                    {
-                        Logger.getLogger(Playlist.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    
-                }
+                } // for the amount of files in the playlist folder
             }
         } else {
             System.out.println("Playlists directory not found, cannot initialize playlists.");

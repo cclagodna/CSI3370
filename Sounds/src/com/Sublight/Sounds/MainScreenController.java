@@ -89,7 +89,9 @@ public class MainScreenController implements Initializable {
         String artistName = artistNameText.getText();
         String albumName = albumNameText.getText();
         
-        uploadMP3Label.setText(Helpers.uploadCheck(f, sName, artistName, albumName));
+        Song s = new Song(f, sName, artistName, albumName);
+        
+        uploadMP3Label.setText(Helpers.uploadCheck(s));
     }
     
 }

@@ -33,8 +33,13 @@ public class Helpers
     }
     
     // This function is used to make sure all the details of Song are included in the file upload.
-    public static String uploadCheck(File f, String sName, String artistName, String albumName) 
+    public static String uploadCheck(Song s) 
     {
+        File f = s.getmp3Location();
+        String sName = s.getSongName();
+        String artistName = s.getArtistName();
+        String albumName = s.getAlbumName();
+        
         if (f.exists()) 
         {
             if (sName != null) 
@@ -45,9 +50,9 @@ public class Helpers
                     {
                         String filepath = uploadSongPath + sName + "+" + artistName + ".mp3";
                         File newFileLoc = new File(filepath);
-                        Song s = new Song(newFileLoc, sName, artistName, albumName);
+                        Song temp = new Song(newFileLoc, sName, artistName, albumName);
                         Helpers.uploadFile(f, filepath);
-                        s.createJSONFile(s);
+                        temp.createJSONFile(temp);
                         return "MP3 Uploaded Successfully!";
                     } else {
                         return "No Album specified!";
@@ -67,7 +72,7 @@ public class Helpers
     the songs properly despite who uploads them with the program.
     Example: "resources/Songs/abc.mp3" becomes "resources\Songs\abc.mp3" for Windows users.
     */
-    public static String convertFilePath(File f) 
+    public static File convertFilePath(File f) 
     {
         String s = f.getPath();
         char c = s.charAt(8);
@@ -76,7 +81,7 @@ public class Helpers
         {
             s = s.replace(s.charAt(8), p.charAt(0));
         }
-        return s;
+        return new File(s);
     }
     
 }
