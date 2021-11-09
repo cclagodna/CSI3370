@@ -2,6 +2,7 @@ package com.Sublight.Sounds;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,6 +29,8 @@ public class MainScreenController implements Initializable {
     public MusicPlayer musicPlayer;
     public MediaPlayer mp;
     
+    public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
+    
     @FXML
     private TextField uploadText;
     @FXML
@@ -49,6 +52,7 @@ public class MainScreenController implements Initializable {
         uploadText.setEditable(false);
         //playlistOneSong();
         //playlistTwoSongs();
+        loadPlaylistTest();
     }    
 
     // this is the function for the play button
@@ -102,8 +106,8 @@ public class MainScreenController implements Initializable {
         p.addSong(s1);
         p.updateTextFile();
     }
+   
     
-    // Result: updateText() won't replace a currently existing PlayList text file with the new copy.
     public void playlistTwoSongs() 
     {
         Song s1 = new Song(new File("resources/Songs/Test+123.mp3"), "Test", "123", "abc");
@@ -112,6 +116,24 @@ public class MainScreenController implements Initializable {
         p.addSong(s1);
         p.addSong(s2);
         p.updateTextFile();
+    }
+    
+    // Result: Broken. loadPlaylists() needs to be fixed (Paths.get(filepath))
+    public void loadPlaylistTest() 
+    {
+        allPlaylists = Playlist.loadPlaylists();
+        for (Playlist p : allPlaylists) 
+        {
+            System.out.println("Playlist Name: " + p.getName());
+            ArrayList<Song> songs = p.getPlaylist();
+            for (Song s: songs) 
+            {
+                System.out.println("Song Name: " + s.getSongName());
+                System.out.println("Artist Name: " + s.getArtistName());
+                System.out.println("Album Name: " + s.getAlbumName());
+                System.out.println("File Location: " + s.getmp3Location());
+            }
+        }
     }
     
 }

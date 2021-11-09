@@ -3,10 +3,13 @@ package com.Sublight.Sounds;
 import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -19,7 +22,6 @@ import java.util.logging.Logger;
  */
 public class Playlist 
 {
-    private static ArrayList<ArrayList<Song>> arrayOfAllPlaylists = new ArrayList<ArrayList<Song>>();
     public static String p = System.getProperty("file.separator"); 
     public String playlistFolderPath = "resources" + p + "Playlists" + p;
     private ArrayList<Song> playlist; // arrayList for specified playlist
@@ -71,9 +73,7 @@ public class Playlist
         return playlist.contains(s);
     }
     
-    /*
-    TODO: Add function to make a (Playlist Name).txt file that contains all the Song locations (their text/JSON files that contain their metaData)
-    */
+    // call this function when updating a playlists text file (so whenever a playlist changes in any way)
     public void updateTextFile() 
     {
         File f = new File(playlistFolderPath + this.name + ".txt");
@@ -95,7 +95,8 @@ public class Playlist
                 for (Song s : playlist) // for all songs in the playlist
                 {
                     String songPath = Song.getJSONLocation(s).getPath(); // get it's JSON file location
-                    fr.append(songPath + "\n"); // add it to this text file
+                    //fr.write(songPath + "\n"); // add it to this text file
+                    fr.write(songPath + System.getProperty("line.separator"));
                 }
             }
             fr.close(); // close the FileWriter after you're done
@@ -104,18 +105,23 @@ public class Playlist
         }
     }
         
-    /*
-    TODO: Add a function that loads all playlists at the beginning of the programs runtime.
-    */
-    public static void loadPlaylists() 
+    // this function will be called at the start of the programs runtime so all the playlists are loaded into it.
+    public static ArrayList<Playlist> loadPlaylists() 
     {
+        ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
         File f = new File("resources" + p + "Playlists");
         if (f.exists() && f.isDirectory()) 
         {
-            if (f.length() > 0) 
+            if (f.length() > 0) // getting the files of the playlist folder (minus DS_Store files)
             {
-                File[] dirContents = f.listFiles(); // getting the files of the playlist folder
-                for (File temp : dirContents) // for all files in the array
+                File[] dirContents = f.listFiles(new FilenameFilter() { 
+                    @Override
+                    public boolean accept(File file, String string) {
+                        return !string.equals(".DS_Store");
+                    }
+                    
+                }); 
+                for (File temp : dirContents) // for all files in the playlists folder
                 {
                     if (temp.isFile()) // if the file is a file rather than a directory.
                     {
@@ -123,31 +129,33 @@ public class Playlist
                         {
                             Scanner scan = new Scanner(temp); // Creating a scanner for the text file
                             Gson gson = new Gson();
-                            ArrayList<Song> tempPlaylist = new ArrayList<Song>();
+                            int dot = temp.getName().lastIndexOf(".");
+                            Playlist p = new Playlist(temp.getName().substring(0, dot));
                             while (scan.hasNextLine()) // while the text file has more JSON file locations to read
                             {
                                 String filePath = scan.nextLine(); // go to the next line of the textfile
-                                try 
+                                filePath = filePath.replace("\0", ""); // removing null from filename
+                                try (Reader reader = new FileReader(filePath)) // reading at the filepath
                                 {
-                                    Reader reader = Files.newBufferedReader(Paths.get(filePath)); // get the JSON File
                                     Song s = gson.fromJson(reader, Song.class); // converting the JSON File into a Song Object.
                                     s.setmp3Location(Helpers.convertFilePath(s.getmp3Location())); // this makes sure the filepath is correct for the OS
-                                    tempPlaylist.add(s); // adding the song to that playlist
+                                    p.addSong(s); // adding the song to that playlist
                                 }
                                 catch (IOException ex) {
                                     Logger.getLogger(Playlist.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
-                            arrayOfAllPlaylists.add(tempPlaylist); // adding that arraylist of songs to the list of all playlists.
+                            allPlaylists.add(p); // adding playlist to the arraylist of all playlists
                         } catch (FileNotFoundException ex) 
                         {
                             Logger.getLogger(Playlist.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-                } // for the amount of files in the playlist folder
+                }
             }
         } else {
             System.out.println("Playlists directory not found, cannot initialize playlists.");
         }
+        return allPlaylists;
     }
 }

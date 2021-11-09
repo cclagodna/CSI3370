@@ -75,11 +75,11 @@ public class Helpers
     public static File convertFilePath(File f) 
     {
         String s = f.getPath();
-        char c = s.charAt(8);
+        char c = s.charAt(9);
         // if the / after "resources" is not equal to your path separator, change it for the whole string.
-        if (!(s.charAt(8) == p.charAt(0))) 
+        if (!(s.charAt(9) == p.charAt(0))) 
         {
-            s = s.replace(s.charAt(8), p.charAt(0));
+            s = s.replace(s.charAt(9), p.charAt(0));
         }
         return new File(s);
     }
