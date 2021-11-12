@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import javafx.scene.image.Image;
 
 /**
  *
@@ -17,6 +18,7 @@ public class Song
     private String songName; // song name
     private String artistName; // artist name
     private String albumName; // album name
+    private Image albumArt; // album Image
     
     public Song(File location, String song, String artist, String album) 
     {
@@ -24,6 +26,15 @@ public class Song
         this.songName = song;
         this.artistName = artist;
         this.albumName = album;
+    }
+    
+    public Song(File location, String song, String artist, String album, Image image) 
+    {
+        this.mp3Location = location;
+        this.songName = song;
+        this.artistName = artist;
+        this.albumName = album;
+        this.albumArt = image;
     }
 
     public File getmp3Location() {
@@ -56,6 +67,14 @@ public class Song
 
     public void setAlbumName(String albumName) {
         this.albumName = albumName;
+    }
+    
+    public Image getAlbumArt() {
+        return albumArt;
+    }
+
+    public void setAlbumArt(Image albumArt) {
+        this.albumArt = albumArt;
     }
     
     // This is checking whether the song MP3 file still exists or not.
