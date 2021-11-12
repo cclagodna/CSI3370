@@ -18,6 +18,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Duration;
+
 
 /**
  * FXML Controller class
@@ -32,6 +34,7 @@ public class MainScreenController implements Initializable {
     public String p = System.getProperty("file.separator"); 
     public MusicPlayer musicPlayer;
     public MediaPlayer mp;
+    private Duration duration;
     
     public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
     
@@ -47,6 +50,12 @@ public class MainScreenController implements Initializable {
     private Label uploadMP3Label;
     @FXML
     private Slider volumeSlider;
+    @FXML
+    private Slider timeSlider;
+    @FXML 
+    private Label totalTimeDisplay;
+    @FXML
+    private Label currentTimeDisplay;
     
     /**
      * Initializes the controller class.
@@ -68,6 +77,32 @@ public class MainScreenController implements Initializable {
                   }
            
        });
+        
+        //set up the timeSlider so it has relevant and current values
+        mp.currentTimeProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable o) {
+                updateTimeValues();
+            }   
+        });
+        // get duration of current song so it can be displayed
+         mp.setOnReady(new Runnable(){
+                public void run(){
+                   duration = mp.getMedia().getDuration();
+                   updateTimeValues();
+                }
+            });
+        
+        //make scrubbing possible for timeSlider
+        timeSlider.valueProperty().addListener(new InvalidationListener(){
+            @Override
+            public void invalidated(Observable o) {
+                if(timeSlider.isValueChanging()){
+                    mp.seek(duration.multiply(timeSlider.getValue()/100));
+               }
+            }
+            
+        });
     }    
 
     // this is the function for the play button
@@ -151,4 +186,25 @@ public class MainScreenController implements Initializable {
         }
     }
     
+    //update the timeLabels and timeSlider to current song time location values
+    public void updateTimeValues(){
+         
+        Duration currentTime = mp.getCurrentTime();
+        totalTimeDisplay.setText(formatDuration(duration));
+        currentTimeDisplay.setText(formatDuration(currentTime));
+        timeSlider.setValue(currentTime.divide(duration).toMillis() * 100);
+        
+      
+    }
+    
+    //format duration into readable time for songs
+    public String formatDuration(Duration d){
+        double seconds = d.toSeconds();
+        int absSeconds = (int)(seconds);
+        String returner = String.format("%d:%02d",
+                (absSeconds / 60), (absSeconds % 60));
+        return returner;
+    }
+
+
 }

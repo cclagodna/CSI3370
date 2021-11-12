@@ -3,8 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Carl/Downloads/SublightMusic0.1/Sounds/src/com/Sublight/Sounds/Helpers.java</file>
-            <file>file:/C:/Users/Carl/Downloads/SublightMusic0.1/Sounds/src/com/Sublight/Sounds/MainScreenController.java</file>
+            <file>file:/C:/Users/gpopr/Documents/NetBeansProjects/CSI3370-SublightSounds-v0.1/SublightSounds%20v0.1/src/com/Sublight/Sounds/MainScreen.fxml</file>
+            <file>file:/C:/Users/gpopr/Documents/NetBeansProjects/CSI3370-SublightSounds-v0.1/SublightSounds%20v0.1/src/com/Sublight/Sounds/MainScreenController.java</file>
+            <file>file:/C:/Users/gpopr/Documents/NetBeansProjects/CSI3370-SublightSounds-v0.1/SublightSounds%20v0.1/src/com/Sublight/Sounds/MusicPlayer.java</file>
         </group>
     </open-files>
 </project-private>
