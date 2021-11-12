@@ -50,9 +50,9 @@ public class MainScreenController implements Initializable {
         musicPlayer = new MusicPlayer("resources" + p + "rickroll.mp3");
         mp = musicPlayer.getMediaPlayer();
         uploadText.setEditable(false);
-        //playlistOneSong();
-        //playlistTwoSongs();
-        loadPlaylistTest();
+        //TestCases.playlistOneSong();
+        //TestCases.playlistTwoSongs();
+        //TestCases.loadPlaylistTest(allPlaylists);
     }    
 
     // this is the function for the play button
@@ -97,43 +97,6 @@ public class MainScreenController implements Initializable {
         
         Song s = new Song(f, sName, artistName, albumName);
         uploadMP3Label.setText(Helpers.uploadCheck(s));
-    }
-    
-    
-    public void playlistOneSong() {
-        Playlist p = new Playlist("TestPlaylist");
-        Song s1 = new Song(new File("resources/Songs/Test+123.mp3"), "Test", "123", "abc");
-        p.addSong(s1);
-        p.updateTextFile();
-    }
-   
-    
-    public void playlistTwoSongs() 
-    {
-        Song s1 = new Song(new File("resources/Songs/Test+123.mp3"), "Test", "123", "abc");
-        Song s2 = new Song(new File("resources/Songs/Hello+World.mp3"), "Hello", "World", "Java");
-        Playlist p = new Playlist("TestPlaylist");
-        p.addSong(s1);
-        p.addSong(s2);
-        p.updateTextFile();
-    }
-    
-    // Result: Broken. loadPlaylists() needs to be fixed (Paths.get(filepath))
-    public void loadPlaylistTest() 
-    {
-        allPlaylists = Playlist.loadPlaylists();
-        for (Playlist p : allPlaylists) 
-        {
-            System.out.println("Playlist Name: " + p.getName());
-            ArrayList<Song> songs = p.getPlaylist();
-            for (Song s: songs) 
-            {
-                System.out.println("Song Name: " + s.getSongName());
-                System.out.println("Artist Name: " + s.getArtistName());
-                System.out.println("Album Name: " + s.getAlbumName());
-                System.out.println("File Location: " + s.getmp3Location());
-            }
-        }
     }
     
 }

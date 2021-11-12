@@ -1,6 +1,7 @@
 package com.Sublight.Sounds;
 
 import java.io.File;
+import java.util.ArrayList;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
@@ -15,9 +16,11 @@ that allows us to change songs and such in our MainScreenController class
 */
 public class MusicPlayer {
     
-    private String path; // the string literal of the path of our file
+    private String path; // the string literal of the path of our MP3 file
     private Media mediaBefore; // creating Media object for our path
     private MediaPlayer player; // creating mediaPlayer for interacting w/ songs
+    private Song currentSong; // current song the MusicPlayer is playing
+    private Playlist currentPlaylist; // current playlist the MusicPlayer is using
     
     // constructor to be called in MainScreenController on startup
     public MusicPlayer(String pathname) 
@@ -25,6 +28,16 @@ public class MusicPlayer {
         this.path = new File(pathname).getAbsolutePath();
         this.mediaBefore = new Media(new File(this.path).toURI().toString());
         this.player = new MediaPlayer(mediaBefore);
+    }
+    
+    // MusicPlayer constructor with Song, Playlist
+    public MusicPlayer(Song s, Playlist p) 
+    {
+        this.path = s.getmp3Location().getPath();
+        this.mediaBefore = new Media(new File(this.path).toURI().toString());
+        this.player = new MediaPlayer(mediaBefore);
+        this.currentSong = s;
+        this.currentPlaylist = p;
     }
     
     // path getter
@@ -56,5 +69,43 @@ public class MusicPlayer {
     public void setMediaPlayer(MediaPlayer newPlayer) {
         this.player = newPlayer;
     }
+
+    // currentSong getter
+    public Song getCurrentSong() {
+        return currentSong;
+    }
     
+    // currentSong setter
+    public void setCurrentSong(Song s) {
+        this.currentSong = s;
+    }
+    
+    // currentPlaylist getter
+    public Playlist getCurrentPlaylist() {
+        return currentPlaylist;
+    }
+    
+    // currentPlaylist setter
+    public void setCurrentPlaylist(Playlist p) {
+        this.currentPlaylist = p;
+    }
+    
+    // skipping a song and returning a new MusicPlayer that has updated information;
+    public MusicPlayer skipSong(Song s, Playlist p) 
+    {
+        MusicPlayer send;
+        Song newSong;
+        ArrayList<Song> songs = p.getPlaylist();
+        int index = songs.indexOf(s); // get the index of song passed in
+        int size = songs.size(); // get the size of the playlist
+        if ((index - 1) == size) // if it's the last song of the playlist, go to the first song
+        {
+            newSong = songs.get(0);
+            send = new MusicPlayer(newSong, p);
+        } else { // else get the next song of the playlist
+            newSong = songs.get(index + 1);
+            send = new MusicPlayer(newSong, p);
+        }
+        return send;
+    }
 }
