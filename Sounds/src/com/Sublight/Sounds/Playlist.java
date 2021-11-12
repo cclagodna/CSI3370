@@ -127,7 +127,7 @@ public class Playlist
                             Scanner scan = new Scanner(temp); // Creating a scanner for the text file
                             Gson gson = new Gson();
                             int dot = temp.getName().lastIndexOf(".");
-                            Playlist p = new Playlist(temp.getName().substring(0, dot));
+                            Playlist p = new Playlist(temp.getName().substring(0, dot)); // removing .txt from Playlist name
                             while (scan.hasNextLine()) // while the text file has more JSON file locations to read
                             {
                                 String filePath = scan.nextLine(); // go to the next line of the textfile
