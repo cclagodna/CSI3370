@@ -90,22 +90,36 @@ public class MusicPlayer {
         this.currentPlaylist = p;
     }
     
-    // skipping a song and returning a new MusicPlayer that has updated information;
-    public MusicPlayer skipSong(Song s, Playlist p) 
+    // changing the song to a specified song & playlist
+    public MusicPlayer changeSong(Song s, Playlist p) 
     {
-        MusicPlayer send;
+        if (p.hasSong(s)) {
+            return new MusicPlayer(s, p);
+        }
+        return null;
+    }
+    
+    // skipping to next song in a given playlist and returning a new MusicPlayer that has updated information;
+    public MusicPlayer skipSong() 
+    {
+        MusicPlayer send = null;
         Song newSong;
-        ArrayList<Song> songs = p.getPlaylist();
-        int index = songs.indexOf(s); // get the index of song passed in
-        int size = songs.size(); // get the size of the playlist
-        if ((index - 1) == size) // if it's the last song of the playlist, go to the first song
+        ArrayList<Song> songs = currentPlaylist.getPlaylist();
+        if (currentPlaylist.hasSong(currentSong)) // if the playlist has the specified song
         {
-            newSong = songs.get(0);
-            send = new MusicPlayer(newSong, p);
-        } else { // else get the next song of the playlist
-            newSong = songs.get(index + 1);
-            send = new MusicPlayer(newSong, p);
+            int index = songs.indexOf(currentSong); // get the index of song passed in
+            int size = songs.size(); // get the size of the playlist
+            if ((index - 1) == size) // if it's the last song of the playlist, go to the first song
+            {
+                newSong = songs.get(0);
+                send = new MusicPlayer(newSong, currentPlaylist);
+            } else 
+            { // else get the next song of the playlist
+                newSong = songs.get(index + 1);
+                send = new MusicPlayer(newSong, currentPlaylist);
+            }
         }
         return send;
     }
+    
 }
