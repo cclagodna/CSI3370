@@ -16,25 +16,25 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Playlist 
-{
+public class Playlist {
     public static String p = System.getProperty("file.separator"); 
     public String playlistFolderPath = "resources" + p + "Playlists" + p;
     private ArrayList<Song> playlist; // arrayList for specified playlist
     private String name; // name for specified Playlist
     
-    //CONSTRUCTORS
-    public Playlist(){
+    //CONSTRUCTORS #####################################################
+    
+    //Instantiate Playlist with a default name
+    public Playlist() {
         this("New Playlist");
     }
     
-    public Playlist(String playlistName) 
-    {
+    public Playlist(String playlistName) {
         this.playlist = new ArrayList<Song>();
         this.name = playlistName;
     }
     
-    //CONSTRUCTORS
+    //CONSTRUCTORS #####################################################
     
     //Returns a shuffled version of array
     public ArrayList shuffle() {

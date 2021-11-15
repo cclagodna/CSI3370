@@ -7,23 +7,61 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import javafx.scene.image.Image;
+import javafx.scene.media.Media;
 
-public class Song 
+/*
+This class will hold all information regaring a song file and metadata, such as:
+    file location,
+    song name,
+    artist name,
+    album name,
+    album art
+*/
+
+
+public class Song
 {
-    public static String p = System.getProperty("file.separator"); // File Separator
+    //File separator character, dependent on end-user's system
+    public static String p = System.getProperty("file.separator");
    
-    private File mp3Location; // location of MP3 file for song
-    private String songName; // song name
-    private String artistName; // artist name
-    private String albumName; // album name
+    //File containing mp3
+    private File mp3Location;
+    //Song name
+    private String songName;
+    //Song artist's name
+    private String artistName;
+    //Song album's name
+    private String albumName;
+    //Song album art
+    private Image albumArt;
     
-    public Song(File location, String song, String artist, String album) 
+    
+    //CONSTRUCTORS #####################################################
+    
+    //Just file location passed as a String
+    public Song(String location) {
+        this(new File(location));
+    }
+    
+    //Just file location passed as a File object
+    public Song(File location) {
+        this.mp3Location = location;
+        this.songName = location.toString();
+        this.artistName = "NotFound";
+        this.albumName = "NotFound";
+    }
+    
+    //Song File, name, artist, album
+    public Song(File location, String name, String artist, String album) 
     {
         this.mp3Location = location;
-        this.songName = song;
+        this.songName = name;
         this.artistName = artist;
         this.albumName = album;
     }
+    
+    //CONSTRUCTORS #####################################################
 
     public File getmp3Location() {
         return mp3Location;

@@ -12,6 +12,7 @@ import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -30,8 +31,7 @@ public class MainScreenController implements Initializable {
     use /, while WindowsOS use \.
     */
     public String p = System.getProperty("file.separator"); 
-    public MusicPlayer musicPlayer;
-    public MediaPlayer mp;
+    public MusicPlayer mp;
     
     public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
     
@@ -47,45 +47,57 @@ public class MainScreenController implements Initializable {
     private Label uploadMP3Label;
     @FXML
     private Slider volumeSlider;
+    @FXML
+    private Button btnSkip;
     
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        musicPlayer = new MusicPlayer("resources" + p + "rickroll.mp3");
-        mp = musicPlayer.getMediaPlayer();
-        uploadText.setEditable(false);
-        //playlistOneSong();
-        //playlistTwoSongs();
+        //Initialize MediaPlayer object with a base song
+        //musicPlayer = new MusicPlayer("resources" + p + "rickroll.mp3");
+        mp = new MusicPlayer();
+        //mp = musicPlayer.getMediaPlayer();
         
-        volumeSlider.setValue(mp.getVolume() *100);
-        //mp.volumeProperty().bindBidirectional(volumeController.valueProperty());
+        uploadText.setEditable(false);
+        
+        //Create VolumeSlider object, allowing the user to control the output volume of the player
+        volumeSlider.setValue(mp.getPlayer().getVolume() *100);
         volumeSlider.valueProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable o) {
-                mp.setVolume(volumeSlider.getValue() /100);
-                  }
-           
+                mp.getPlayer().setVolume(volumeSlider.getValue() /100);
+                  } 
        });
+        
     }    
 
+    
+    //TODO Add a button that runs this code
+    @FXML
+    private void btnSkipSong(ActionEvent event) {
+        //Stops current song, then plays the next one
+        btnStopClicked(event);
+        mp.nextSong();
+    }
+    
     // this is the function for the play button
     @FXML
     private void btnPlayClicked(ActionEvent event) {
-       mp.play();
+       mp.getPlayer().play();
     }
     
     // this is the function for the pause button
     @FXML
     private void btnPauseClicked(ActionEvent event) {
-        mp.pause();
+        mp.getPlayer().pause();
     }
 
     // this is the function for the stop button
     @FXML
     private void btnStopClicked(ActionEvent event) {
-        mp.stop();
+        mp.getPlayer().stop();
     }
     
     // this is the function for the select button
@@ -112,25 +124,6 @@ public class MainScreenController implements Initializable {
         
         Song s = new Song(f, sName, artistName, albumName);
         uploadMP3Label.setText(Helpers.uploadCheck(s));
-    }
-    
-    
-    public void playlistOneSong() {
-        Playlist p = new Playlist("TestPlaylist");
-        Song s1 = new Song(new File("resources/Songs/Test+123.mp3"), "Test", "123", "abc");
-        p.addSong(s1);
-        p.updateTextFile();
-    }
-   
-    
-    public void playlistTwoSongs() 
-    {
-        Song s1 = new Song(new File("resources/Songs/Test+123.mp3"), "Test", "123", "abc");
-        Song s2 = new Song(new File("resources/Songs/Hello+World.mp3"), "Hello", "World", "Java");
-        Playlist p = new Playlist("TestPlaylist");
-        p.addSong(s1);
-        p.addSong(s2);
-        p.updateTextFile();
     }
     
     // Result: Broken. loadPlaylists() needs to be fixed (Paths.get(filepath))
