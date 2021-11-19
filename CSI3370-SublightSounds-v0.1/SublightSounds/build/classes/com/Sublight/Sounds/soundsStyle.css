@@ -1,0 +1,27 @@
+/* 
+    Created on : Nov 9, 2021, 8:27:35 PM
+    Author     : Connor
+    
+    This is just an experiment. I had a friend who said you could style javaFX using CSS
+*/
+
+.sidebar{
+    -fx-background-color: #25263A;
+}
+.sidebar-btn{
+    -fx-background-color:transparent;
+}
+.sidebar-btn-txt{
+    -fx-text-fill:#ffffff;
+     
+}
+
+.mainPane{
+    -fx-background-color:#23345a;
+        
+}
+
+.imgpane{
+    -fx-background-radius:30px;
+    
+}
