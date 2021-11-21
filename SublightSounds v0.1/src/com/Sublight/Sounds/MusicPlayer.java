@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaPlayer.Status;
 
 /*
 This is a helper class that allows us to make an object
@@ -81,7 +80,6 @@ public class MusicPlayer {
     //Used for when a file isn't specified at moment of construction
     public void setDefaultSong() {
         //Create ArrayList of all songs in SongFolder
-        System.out.println(songFolder.listFiles());
         for (File f : files) {
             System.out.println(f.getName());
         }
@@ -91,7 +89,7 @@ public class MusicPlayer {
             setSong(files.get(0));
         }
         //Print confirmation message to console
-        System.out.printf("Successfully loaded song: %s%n", getSong().getName());
+        System.out.printf("Successfully loaded song: %s%n", currSong.getName());
     }
     
     //When setting a new song, updates all respective fields (path, media, mediaPlayer, etc)
@@ -102,10 +100,10 @@ public class MusicPlayer {
         setMedia();
         setPlayer();
         //Print confirmation message to console
-        System.out.printf("Successfully loaded song: %s%n", getSong().getName());
-        //Sets the song to PLAY
-        //This may cause bugs; however, when going to the next song, the player is probably PLAYing
-        //Should be fine... 
+        System.out.printf("Successfully loaded song: %s%n", currSong.getName());
+        //Sets the musicPlayer to PLAY
+        //This may cause unintentional behavior
+        //However, since the player is likely playing when going to the next song, should be fine...
         getPlayer().play();
     }
     
@@ -116,12 +114,10 @@ public class MusicPlayer {
     //Sets the player to a new song
     //Funnels into updateMusicPlayer() function
     private void setSong(String s) {
-        //setSong(new File(s));
-        this.currSong = new File(s);
+        setSong(new File(s));
     }
     
     private void setSong(File f) {
-        //updateMusicPlayer(f);
         this.currSong = f;
     }
     

@@ -3,6 +3,10 @@
  */
 package com.Sublight.Sounds;
 
+import com.mpatric.mp3agic.ID3v2;
+import com.mpatric.mp3agic.InvalidDataException;
+import com.mpatric.mp3agic.Mp3File;
+import com.mpatric.mp3agic.UnsupportedTagException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,57 +18,92 @@ import java.util.logging.Logger;
 
 public class Helpers 
 {
-    public static String p = System.getProperty("file.separator");
-    public static String uploadSongPath = "resources" + p + "Songs" + p;
+    public final static String p = System.getProperty("file.separator");
+    public static String songResourcePath = "Resources" + p + "Songs" + p;
+    //Stores message about the status of upload functionality
+    static String uploadStatus = "";
     
-    /* Use this function when wanting to move a selected file to a target directory.
-    */
-    public static boolean uploadFile(File origFile, String newLoc) 
+    
+    public static String uploadFile(File origFile) throws IOException, UnsupportedTagException, InvalidDataException {
+        return uploadFile(origFile, songResourcePath);
+    }
+    
+    //Move a selected file to a target directory.
+    public static String uploadFile(File f, String newLoc) throws IOException, UnsupportedTagException, InvalidDataException
     {
-        Path oldPath = Paths.get(origFile.getAbsolutePath());
-        Path newPath = Paths.get(newLoc);
-        try {
+        //Current location of file
+        Path oldPath = Paths.get(f.getAbsolutePath());
+        //Desired location of file, must append f.getName() or else errors arise
+        Path newPath = Paths.get(newLoc + f.getName());
+        
+        boolean canUpload = uploadCheck(f, newLoc);
+        
+        //If file can be uploaded
+        if (canUpload) try {
+            //Moves file to new path, replacing existing file of same name (if that exists)
             Files.move(oldPath, newPath, REPLACE_EXISTING);
+            //If the file should be copied instead of just moved
+            //Files.copy(oldPath, newPath, REPLACE_EXISTING);
         } catch (IOException ex) {
             Logger.getLogger(Helpers.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return true;
+        
+        //File cant be uploaded, return error message
+        else return uploadStatus;
+        
+        //Set uploadStatus to a success message
+        setUploadStatus("MP3 Uploaded Successfully!");
+        return uploadStatus;
     }
     
-    // This function is used to make sure all the details of Song are included in the file upload.
-    public static String uploadCheck(Song s) 
+   
+    // This function is used to make sure all the details of mp3 are included in the file upload.
+    // Any reason to deny an upload (wrong file type, missing metadata, etc) should be designated here
+    public static boolean uploadCheck(File f, String path) throws IOException, UnsupportedTagException, InvalidDataException 
     {
-        File f = s.getmp3Location();
-        String sName = s.getSongName();
-        String artistName = s.getArtistName();
-        String albumName = s.getAlbumName();
+        //Extract ID3 information from mp3
+        //Any file passed to this method SHOULD be an mp3 with an ID3v2 tag
+        ID3v2 tag = new Mp3File(f).getId3v2Tag();
+        //Retrive song name
+        String sName = tag.getTitle();
+        //Retrieve artist name
+        String artistName = tag.getArtist();
+        //Retrive album name
+        String albumName = tag.getAlbum();
         
-        if (f.exists()) 
-        {
-            if (sName != null) 
-            {
-                if (artistName != null) 
-                {
-                    if (albumName != null) 
-                    {
-                        String filepath = uploadSongPath + sName + "+" + artistName + ".mp3";
-                        File newFileLoc = new File(filepath);
-                        Song temp = new Song(newFileLoc, sName, artistName, albumName);
-                        Helpers.uploadFile(f, filepath);
-                        temp.createJSONFile(temp);
-                        return "MP3 Uploaded Successfully!";
-                    } else {
-                        return "No Album specified!";
-                    }
-                } else {
-                    return "No Artist specified!";
-                }
-            } else {
-                return "No Song Name specified!";
-            }
-        } else {
-            return "No MP3 File to upload!";
+        if ( !f.exists() ) {
+            setUploadStatus("No MP3 File to upload!");
+            return false;
         }
+        
+        //If file does not have extension .mp3
+        if (!f.getName().endsWith(".mp3")){
+            setUploadStatus("This file is not an mp3!");
+            return false;
+        }
+        
+        if ( sName == null ) {
+            setUploadStatus("No Song Name Specified!");
+            return false;
+        }
+        
+        if ( artistName == null ) {
+            setUploadStatus("No Artist Name Specified!");
+            return false;
+        }
+        
+        if ( albumName == null ) {
+            setUploadStatus("No Album Name Specified!");
+            return false;
+        }
+        
+        if (!(new File(path)).exists()) {
+            setUploadStatus("Desired copy path doesn't exist!");
+            return false;
+        }
+        
+        setUploadStatus("MP3 viable for upload");
+        return true;
     }
     
     /* This converts file paths between Mac and Windows so the program can load
@@ -83,4 +122,11 @@ public class Helpers
         return new File(s);
     }
     
+    private static void setUploadStatus(String s) {
+        uploadStatus = s;
+    }
+    
+    public static String getUploadStatus() {
+        return uploadStatus;
+    }
 }
