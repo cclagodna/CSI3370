@@ -23,9 +23,9 @@ public class TestCases
         p.updateTextFile();
     }
     
-    public static void loadPlaylistTest(ArrayList<Playlist> aP) 
+    public static void loadPlaylistTest() 
     {
-        aP = Playlist.loadPlaylists();
+        ArrayList<Playlist> aP = Playlist.loadPlaylists();
         for (Playlist p : aP) 
         {
             System.out.println("Playlist Name: " + p.getName());
@@ -36,6 +36,9 @@ public class TestCases
                 System.out.println("Artist Name: " + s.getArtistName());
                 System.out.println("Album Name: " + s.getAlbumName());
                 System.out.println("File Location: " + s.getmp3Location());
+                if (s.getAlbumArt() != null) {
+                    System.out.println("Album Art Location: " + s.getAlbumArt());
+                }
             }
         }
     }

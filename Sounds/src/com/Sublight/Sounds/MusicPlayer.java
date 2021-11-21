@@ -17,25 +17,34 @@ that allows us to change songs and such in our MainScreenController class
 public class MusicPlayer {
     
     private String path; // the string literal of the path of our MP3 file
-    private Media mediaBefore; // creating Media object for our path
+    private Media media; // creating Media object for our path
     private MediaPlayer player; // creating mediaPlayer for interacting w/ songs
     private Song currentSong; // current song the MusicPlayer is playing
     private Playlist currentPlaylist; // current playlist the MusicPlayer is using
     
     // constructor to be called in MainScreenController on startup
-    public MusicPlayer(String pathname) 
+    public MusicPlayer() 
     {
-        this.path = new File(pathname).getAbsolutePath();
-        this.mediaBefore = new Media(new File(this.path).toURI().toString());
-        this.player = new MediaPlayer(mediaBefore);
+        Playlist p = Playlist.allSongs();
+        ArrayList<Song> list = p.getPlaylist();
+        if (!list.isEmpty()) // get the first song in the songs folder
+        {
+            this.path = list.get(0).getmp3Location().getAbsolutePath();
+            this.currentSong = list.get(0);
+            this.currentPlaylist = p;
+        } else { // else use the default song
+            this.path = new File("resources" + System.getProperty("file.separator") + "rickroll.mp3").getAbsolutePath();
+        }
+        this.media = new Media(new File(this.path).toURI().toString());
+        this.player = new MediaPlayer(media);
     }
     
     // MusicPlayer constructor with Song, Playlist
     public MusicPlayer(Song s, Playlist p) 
     {
         this.path = s.getmp3Location().getPath();
-        this.mediaBefore = new Media(new File(this.path).toURI().toString());
-        this.player = new MediaPlayer(mediaBefore);
+        this.media = new Media(new File(this.path).toURI().toString());
+        this.player = new MediaPlayer(media);
         this.currentSong = s;
         this.currentPlaylist = p;
     }
@@ -52,12 +61,12 @@ public class MusicPlayer {
     
     // media getter
     public Media getMedia() {
-        return mediaBefore;
+        return media;
     }
     
     // media setter
     public void setMedia(Media newMedia) {
-        this.mediaBefore = newMedia;
+        this.media = newMedia;
     }
     
     // mediaPlayer getter
@@ -109,7 +118,7 @@ public class MusicPlayer {
         {
             int index = songs.indexOf(currentSong); // get the index of song passed in
             int size = songs.size(); // get the size of the playlist
-            if ((index - 1) == size) // if it's the last song of the playlist, go to the first song
+            if ((index + 1) == size) // if it's the last song of the playlist, go to the first song
             {
                 newSong = songs.get(0);
                 send = new MusicPlayer(newSong, currentPlaylist);

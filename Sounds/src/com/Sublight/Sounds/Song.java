@@ -1,6 +1,7 @@
 package com.Sublight.Sounds;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,7 +19,7 @@ public class Song
     private String songName; // song name
     private String artistName; // artist name
     private String albumName; // album name
-    private Image albumArt; // album Image
+    private File albumArt; // album Image
     
     public Song(File location, String song, String artist, String album) 
     {
@@ -28,7 +29,7 @@ public class Song
         this.albumName = album;
     }
     
-    public Song(File location, String song, String artist, String album, Image image) 
+    public Song(File location, String song, String artist, String album, File image) 
     {
         this.mp3Location = location;
         this.songName = song;
@@ -69,12 +70,17 @@ public class Song
         this.albumName = albumName;
     }
     
-    public Image getAlbumArt() {
+    public File getAlbumArt() {
         return albumArt;
     }
 
-    public void setAlbumArt(Image albumArt) {
+    public void setAlbumArt(File albumArt) {
         this.albumArt = albumArt;
+    }
+    
+    public Image albumArtToJFX() 
+    {
+        return new Image((this.albumArt).getAbsolutePath());
     }
     
     // This is checking whether the song MP3 file still exists or not.
@@ -94,7 +100,7 @@ public class Song
     public void createJSONFile(Song s)
     {
         File f = Song.getJSONLocation(s); // getting file location of JSON
-        Gson gson = new Gson(); // creating a GSON object
+        Gson gson = new GsonBuilder().setPrettyPrinting().create(); // creating a GSON object
         try (FileWriter writer = new FileWriter(f.getPath())) 
         {
             gson.toJson(s, writer);

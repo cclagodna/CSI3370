@@ -53,15 +53,19 @@ public class Playlist
     
     // adding songs to Playlist
     public void addSong(Song s) {
-        if (!playlist.contains(s)) {
+        if (!playlist.contains(s)) 
+        {
             playlist.add(s);
+            updateTextFile();
         }
     }
     
     // removing songs from Playlist
     public void removeSong(Song s) {
-        if (playlist.contains(s)) {
+        if (playlist.contains(s)) 
+        {
             playlist.remove(s);
+            updateTextFile();
         }
     }
     
@@ -136,6 +140,9 @@ public class Playlist
                                 {
                                     Song s = gson.fromJson(reader, Song.class); // converting the JSON File into a Song Object.
                                     s.setmp3Location(Helpers.convertFilePath(s.getmp3Location())); // this makes sure the filepath is correct for the OS
+                                    if (s.getAlbumArt() != null) {
+                                        s.setAlbumArt(Helpers.convertFilePath(s.getAlbumArt()));
+                                    }
                                     p.addSong(s); // adding the song to that playlist
                                 }
                                 catch (IOException ex) {
@@ -154,5 +161,47 @@ public class Playlist
             System.out.println("Playlists directory not found, cannot initialize playlists.");
         }
         return allPlaylists;
+    }
+    
+    // getting all the songs in the songJSONs folder and turning it into a playlist
+    public static Playlist allSongs() 
+    {
+        Playlist list = new Playlist("All Songs");
+        File f = new File ("resources" + p + "SongJSONs");
+        if (f.exists() && f.isDirectory()) 
+        {
+            if (f.length() > 0) // getting the files of the playlist folder (minus DS_Store files)
+            {
+                File[] dirContents = f.listFiles(new FilenameFilter() { 
+                    @Override
+                    public boolean accept(File file, String string) {
+                        return !string.equals(".DS_Store");
+                    }
+                    
+                }); 
+                for (File temp : dirContents) // for all files in the json folder
+                {
+                    if (temp.isFile()) // if the file is a file rather than a directory.
+                    {
+                        Gson gson = new Gson();
+                        try (Reader reader = new FileReader(temp.getAbsolutePath())) // reading the json file
+                        {
+                            Song s = gson.fromJson(reader, Song.class); // converting the JSON File into a Song Object.
+                            s.setmp3Location(Helpers.convertFilePath(s.getmp3Location())); // this makes sure the filepath is correct for the OS
+                            if (s.getAlbumArt() != null) {
+                                s.setAlbumArt(Helpers.convertFilePath(s.getAlbumArt()));
+                            }
+                            list.addSong(s); // adding the song to that playlist
+                        }
+                        catch (IOException ex) {
+                            Logger.getLogger(Playlist.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }
+        } else {
+            System.out.println("SongJSONs directory not found, cannot initialize playlist.");
+        }
+        return list;
     }
 }

@@ -6,9 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 
 /**
@@ -42,7 +42,7 @@ public class Helpers
         String sName = s.getSongName();
         String artistName = s.getArtistName();
         String albumName = s.getAlbumName();
-        Image image = s.getAlbumArt();
+        File image = s.getAlbumArt();
         
         if (f.exists()) 
         {
@@ -57,13 +57,14 @@ public class Helpers
                         Song temp;
                         if (image != null) 
                         {
-                            temp = new Song(newFileLoc, sName, artistName, albumName, image);
-                            temp.createJSONFile(temp);
-                            File oldImageLoc = new File(s.getAlbumArt().getUrl()); // getting the File of the Image
-                            int dot = image.getUrl().lastIndexOf(".");
-                            String imageExt = image.getUrl().substring(dot, image.getUrl().length()); // getting the image extension
+                            File oldImageLoc = new File(s.getAlbumArt().getAbsolutePath()); // getting the File of the Image
+                            int dot = oldImageLoc.getAbsolutePath().lastIndexOf(".");
+                            String imageExt = oldImageLoc.getAbsolutePath().substring(dot, oldImageLoc.getAbsolutePath().length()); // getting the image extension
                             String albumArtPath = uploadImagePath + artistName + "+" + albumName + imageExt;
+                            File newArtLoc = new File(albumArtPath);
                             Helpers.uploadFile(oldImageLoc, albumArtPath); // uploading the albumArt to it's respective folder
+                            temp = new Song(newFileLoc, sName, artistName, albumName, newArtLoc);
+                            temp.createJSONFile(temp);
                         } else 
                         {
                             temp = new Song(newFileLoc, sName, artistName, albumName);
@@ -109,6 +110,19 @@ public class Helpers
             s = s.replace(s.charAt(9), p.charAt(0));
         }
         return new File(s);
+    }
+    
+    public static ArrayList<Playlist> onStartLoadPlaylists() 
+    {
+        ArrayList<Playlist> list = new ArrayList<Playlist>();
+        ArrayList<Playlist> playlists = Playlist.loadPlaylists();
+        if (!playlists.isEmpty()) 
+        {
+            for (Playlist p : playlists) {
+                list.add(p);
+            }
+        }
+        return list;
     }
     
 }

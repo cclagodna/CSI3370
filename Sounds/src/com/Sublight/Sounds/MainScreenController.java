@@ -4,12 +4,14 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
@@ -27,9 +29,9 @@ public class MainScreenController implements Initializable {
     */
     public String p = System.getProperty("file.separator"); 
     public MusicPlayer musicPlayer;
-    public MediaPlayer mp;
     
     public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
+    public String selectedPlaylist;
     
     @FXML
     private TextField uploadText;
@@ -40,49 +42,77 @@ public class MainScreenController implements Initializable {
     @FXML
     private TextField albumNameText;
     @FXML
+    private TextField albumArtText;
+    @FXML
     private Label uploadMP3Label;
+    
+    @FXML
+    private ListView<String> playlistView;
+    @FXML
+    private Label playlistViewLabel;
     
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        musicPlayer = new MusicPlayer("resources" + p + "rickroll.mp3");
-        mp = musicPlayer.getMediaPlayer();
+        musicPlayer = new MusicPlayer();
         uploadText.setEditable(false);
+        albumArtText.setEditable(false);
+        allPlaylists = Helpers.onStartLoadPlaylists();
+        playlistViewInitializer();
         //TestCases.playlistOneSong();
         //TestCases.playlistTwoSongs();
-        //TestCases.loadPlaylistTest(allPlaylists);
+        //TestCases.loadPlaylistTest();
     }    
 
     // this is the function for the play button
     @FXML
     private void btnPlayClicked(ActionEvent event) {
-       mp.play();
+       musicPlayer.getMediaPlayer().play();
     }
     
     // this is the function for the pause button
     @FXML
     private void btnPauseClicked(ActionEvent event) {
-        mp.pause();
+        musicPlayer.getMediaPlayer().pause();
     }
 
     // this is the function for the stop button
     @FXML
     private void btnStopClicked(ActionEvent event) {
-        mp.stop();
+        musicPlayer.getMediaPlayer().stop();
     }
     
-    // this is the function for the select button
+    @FXML
+    void btnSkipClicked(ActionEvent event) 
+    {
+        if (musicPlayer != null) 
+        {
+            musicPlayer.getMediaPlayer().stop();
+            musicPlayer = musicPlayer.skipSong();
+        }
+    }
+    
+    // this is the function for the select mp3 button
     @FXML
     private void btnSelectMP3Clicked(ActionEvent event) {
         FileChooser choose = new FileChooser();
         choose.setTitle("Uploading MP3");
         choose.getExtensionFilters().add(new ExtensionFilter("Audio Files", "*.mp3"));
         File f = choose.showOpenDialog(null);
-        if (f != null) 
-        {
+        if (f != null) {
             uploadText.setText(f.getAbsolutePath());
+        }
+    }
+    
+    // function for select album art button
+    @FXML
+    void btnSelectAlbumArtClicked(ActionEvent event) 
+    {
+        File f = Helpers.imageFileChooser();
+        if (f != null) {
+            albumArtText.setText(f.getAbsolutePath());
         }
     }
     
@@ -94,9 +124,36 @@ public class MainScreenController implements Initializable {
         String sName = songNameText.getText();
         String artistName = artistNameText.getText();
         String albumName = albumNameText.getText();
+        Song s;
+        if (albumArtText.getText() != null) 
+        {
+            File art = new File(albumArtText.getText());
+            s = new Song(f, sName, artistName, albumName, art);
+        } 
+        else {
+            s = new Song(f, sName, artistName, albumName);
+        }
         
-        Song s = new Song(f, sName, artistName, albumName);
         uploadMP3Label.setText(Helpers.uploadCheck(s));
+    }
+    
+    public void playlistViewInitializer() 
+    {
+        ArrayList<String> playlistNames = new ArrayList<String>();
+        for (Playlist p : allPlaylists) {
+            playlistNames.add(p.getName());
+        }
+        playlistView.getItems().addAll(playlistNames);
+        playlistView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() 
+        {
+            @Override
+            public void changed(ObservableValue<? extends String> ov, String t, String t1) 
+            {
+                selectedPlaylist = playlistView.getSelectionModel().getSelectedItem();
+                
+                playlistViewLabel.setText("Selected Playlist: " + selectedPlaylist); 
+            }
+        });
     }
     
 }

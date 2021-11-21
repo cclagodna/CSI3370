@@ -1,0 +1,11 @@
+{
+  "mp3Location": {
+    "path": "resources/Songs/Enemy+Imagine Dragons.mp3"
+  },
+  "songName": "Enemy",
+  "artistName": "Imagine Dragons",
+  "albumName": "Arcane",
+  "albumArt": {
+    "path": "resources/Albums/Imagine Dragons+Arcane.jpeg"
+  }
+}
