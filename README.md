@@ -2,6 +2,11 @@ Roger Valade Update Log
 
 (Did work before this - will add those at a later time)
 
+11/22/21
+1) Added a way for program to get previous albumArt and use that for the Song in-case it's not provided.
+2) Code cleanup - made functions like filterMacOS in Helpers that's used in multiple functions across the program. Made other similar changes like this for QOL. 
+3) Changed the way the ListView does things. Instead of looking at the String selected, looks at the index of what's selected to determine Playlist selected. 
+
 11/20/21
 1) Added albumArt file to Songs constructor. Added file selection in GUI to accomodate for uploading albumArt. 
 2) Made it so program loads first song in Songs folder if there is a song, else, uses everyone's favorite song by default.
