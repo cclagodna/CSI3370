@@ -6,11 +6,11 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="434.0" prefWidth="629.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Sublight.Sounds.MainScreenController">
+<AnchorPane id="AnchorPane" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Sublight.Sounds.MainScreenController">
    <children>
-      <Button layoutX="141.0" layoutY="320.0" mnemonicParsing="false" onAction="#btnPlayClicked" prefHeight="27.0" prefWidth="96.0" text="Play" />
-      <Button layoutX="252.0" layoutY="320.0" mnemonicParsing="false" onAction="#btnPauseClicked" prefHeight="27.0" prefWidth="96.0" text="Pause" />
-      <Button layoutX="364.0" layoutY="320.0" mnemonicParsing="false" onAction="#btnStopClicked" prefHeight="27.0" prefWidth="96.0" text="Stop" />
+      <Button layoutX="225.0" layoutY="321.0" mnemonicParsing="false" onAction="#btnPlayClicked" prefHeight="27.0" prefWidth="96.0" text="Play" />
+      <Button layoutX="350.0" layoutY="321.0" mnemonicParsing="false" onAction="#btnPauseClicked" prefHeight="27.0" prefWidth="96.0" text="Pause" />
+      <Button layoutX="475.0" layoutY="321.0" mnemonicParsing="false" onAction="#btnStopClicked" prefHeight="27.0" prefWidth="96.0" text="Stop" />
       <Button layoutX="28.0" layoutY="33.0" mnemonicParsing="false" onAction="#btnSelectMP3Clicked" text="Select MP3" />
       <TextField fx:id="uploadText" layoutX="128.0" layoutY="33.0" prefHeight="27.0" prefWidth="242.0" />
       <Label layoutX="28.0" layoutY="74.0" prefHeight="17.0" prefWidth="69.0" text="Song Name" />
@@ -21,10 +21,12 @@
       <TextField fx:id="albumNameText" layoutX="128.0" layoutY="145.0" prefHeight="27.0" prefWidth="242.0" />
       <Button layoutX="21.0" layoutY="227.0" mnemonicParsing="false" onAction="#btnUploadClicked" prefHeight="27.0" prefWidth="96.0" text="Upload MP3" />
       <Label fx:id="uploadMP3Label" layoutX="128.0" layoutY="227.0" prefHeight="27.0" prefWidth="242.0" text="Upload Status: N/A" />
-      <Button layoutX="273.0" layoutY="362.0" mnemonicParsing="false" onAction="#btnSkipClicked" text="Skip" />
+      <Button layoutX="377.0" layoutY="374.0" mnemonicParsing="false" onAction="#btnSkipClicked" text="Skip" />
       <TextField fx:id="albumArtText" layoutX="128.0" layoutY="190.0" prefHeight="27.0" prefWidth="242.0" />
       <Button layoutX="21.0" layoutY="190.0" mnemonicParsing="false" onAction="#btnSelectAlbumArtClicked" prefHeight="27.0" prefWidth="81.0" text="Album Art" />
-      <ListView fx:id="playlistView" layoutX="397.0" layoutY="30.0" prefHeight="200.0" prefWidth="200.0" />
-      <Label fx:id="playlistViewLabel" layoutX="397.0" layoutY="253.0" text="Selected Playlist: N/A" />
+      <ListView fx:id="playlistView" layoutX="397.0" layoutY="30.0" prefHeight="175.0" prefWidth="175.0" />
+      <Label fx:id="playlistViewLabel" layoutX="423.0" layoutY="241.0" text="Selected Playlist: N/A" />
+      <ListView fx:id="songView" layoutX="587.0" layoutY="32.0" prefHeight="175.0" prefWidth="175.0" />
+      <Label fx:id="songViewLabel" layoutX="618.0" layoutY="241.0" text="Selected Song: N/A" />
    </children>
 </AnchorPane>

@@ -30,6 +30,7 @@ public class MainScreenController implements Initializable {
     
     public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
     public Playlist selectedPlaylist;
+    public Song selectedSong;
     
     @FXML
     private TextField uploadText;
@@ -49,6 +50,11 @@ public class MainScreenController implements Initializable {
     @FXML
     private Label playlistViewLabel;
     
+    @FXML
+    private ListView<String> songView;
+    @FXML
+    private Label songViewLabel;
+    
     /**
      * Initializes the controller class.
      */
@@ -59,9 +65,6 @@ public class MainScreenController implements Initializable {
         albumArtText.setEditable(false);
         allPlaylists = Helpers.onStartLoadPlaylists();
         playlistViewInitializer();
-        //TestCases.playlistOneSong();
-        //TestCases.playlistTwoSongs();
-        //TestCases.loadPlaylistTest();
     }    
 
     // this is the function for the play button
@@ -136,6 +139,7 @@ public class MainScreenController implements Initializable {
         uploadMP3Label.setText(Helpers.uploadCheck(s));
     }
     
+    // not quite done yet, but is a start.
     public void playlistViewInitializer() 
     {
         ArrayList<String> playlistNames = new ArrayList<String>();
@@ -149,8 +153,33 @@ public class MainScreenController implements Initializable {
             public void changed(ObservableValue<? extends String> ov, String t, String t1) 
             {
                 selectedPlaylist = allPlaylists.get(playlistView.getSelectionModel().getSelectedIndex());
-                
+                musicPlayer.setCurrentPlaylist(selectedPlaylist);
                 playlistViewLabel.setText("Selected Playlist: " + selectedPlaylist.getName()); 
+                songViewInitializer();
+            }
+        });
+    }
+    
+    // this is not quite done yet, but is a start.
+    public void songViewInitializer() 
+    {
+        if (songView.getItems() != null) {
+            songView.getItems().clear();
+        }
+        ArrayList<String> songNames = new ArrayList<String>();
+        for (Song s: selectedPlaylist.getPlaylist()) {
+            songNames.add(s.getSongName());
+        }
+        songView.getItems().addAll(songNames);
+        songView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() 
+        {
+            @Override
+            public void changed(ObservableValue<? extends String> ov, String t, String t1) 
+            {
+                selectedSong = selectedPlaylist.getPlaylist().get(songView.getSelectionModel().getSelectedIndex());
+                musicPlayer.setCurrentSong(selectedSong);
+                songViewLabel.setText("Selected Song: " + selectedSong.getSongName());
+                musicPlayer = musicPlayer.changeSong(selectedSong, selectedPlaylist);
             }
         });
     }
