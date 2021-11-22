@@ -42,4 +42,17 @@ public class TestCases
             }
         }
     }
+    
+    public static void checkMusicPlayer(MusicPlayer p) 
+    {
+        if (p != null) 
+        {
+            System.out.println("Path: " + p.getPath());
+            System.out.println("Media: " + p.getMedia().getSource());
+            System.out.println("MediaPlayer: " + p.getMediaPlayer().getMedia().getSource());
+            System.out.println("CurrentSong: " + p.getCurrentSong().getSongName());
+            System.out.println("CurrentPlaylist: " + p.getCurrentPlaylist().getName());
+            System.out.println("---------------------------------------------------------");
+        }
+    }
 }

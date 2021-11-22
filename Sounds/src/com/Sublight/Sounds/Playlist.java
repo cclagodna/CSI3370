@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -115,13 +114,7 @@ public class Playlist
         {
             if (f.length() > 0) // getting the files of the playlist folder (minus DS_Store files)
             {
-                File[] dirContents = f.listFiles(new FilenameFilter() { 
-                    @Override
-                    public boolean accept(File file, String string) {
-                        return !string.equals(".DS_Store");
-                    }
-                    
-                }); 
+                File[] dirContents = Helpers.filterMacOS(f);
                 for (File temp : dirContents) // for all files in the playlists folder
                 {
                     if (temp.isFile()) // if the file is a file rather than a directory.
@@ -172,13 +165,7 @@ public class Playlist
         {
             if (f.length() > 0) // getting the files of the playlist folder (minus DS_Store files)
             {
-                File[] dirContents = f.listFiles(new FilenameFilter() { 
-                    @Override
-                    public boolean accept(File file, String string) {
-                        return !string.equals(".DS_Store");
-                    }
-                    
-                }); 
+                File[] dirContents = Helpers.filterMacOS(f);
                 for (File temp : dirContents) // for all files in the json folder
                 {
                     if (temp.isFile()) // if the file is a file rather than a directory.

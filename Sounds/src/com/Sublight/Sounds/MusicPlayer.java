@@ -44,7 +44,7 @@ public class MusicPlayer {
     {
         this.path = s.getmp3Location().getPath();
         this.media = new Media(new File(this.path).toURI().toString());
-        this.player = new MediaPlayer(media);
+        this.player = new MediaPlayer(this.media);
         this.currentSong = s;
         this.currentPlaylist = p;
     }

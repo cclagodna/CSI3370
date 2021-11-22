@@ -1,2 +1,2 @@
 resources/SongJSONs/Hello+World.json
-resources/SongJSONs/Enemy+Imagine Dragons.json
+resources/SongJSONs/Enemy+ImagineDragons.json

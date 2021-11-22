@@ -12,8 +12,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * FXML Controller class
@@ -31,7 +29,7 @@ public class MainScreenController implements Initializable {
     public MusicPlayer musicPlayer;
     
     public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
-    public String selectedPlaylist;
+    public Playlist selectedPlaylist;
     
     @FXML
     private TextField uploadText;
@@ -91,16 +89,14 @@ public class MainScreenController implements Initializable {
         {
             musicPlayer.getMediaPlayer().stop();
             musicPlayer = musicPlayer.skipSong();
+            TestCases.checkMusicPlayer(musicPlayer);
         }
     }
     
     // this is the function for the select mp3 button
     @FXML
     private void btnSelectMP3Clicked(ActionEvent event) {
-        FileChooser choose = new FileChooser();
-        choose.setTitle("Uploading MP3");
-        choose.getExtensionFilters().add(new ExtensionFilter("Audio Files", "*.mp3"));
-        File f = choose.showOpenDialog(null);
+        File f = Helpers.mp3FileChooser();
         if (f != null) {
             uploadText.setText(f.getAbsolutePath());
         }
@@ -120,20 +116,23 @@ public class MainScreenController implements Initializable {
     @FXML
     void btnUploadClicked(ActionEvent event) 
     {
-        File f = new File(uploadText.getText());
+        File mp3File = new File(uploadText.getText());
         String sName = songNameText.getText();
         String artistName = artistNameText.getText();
         String albumName = albumNameText.getText();
         Song s;
-        if (albumArtText.getText() != null) 
+        File albumArtFile = Helpers.checkForAlbumCover(sName, artistName);
+        if (albumArtFile != null) {
+            s = new Song(mp3File, sName, artistName, albumName, albumArtFile);
+        } 
+        else if (albumArtText.getText() != null) 
         {
             File art = new File(albumArtText.getText());
-            s = new Song(f, sName, artistName, albumName, art);
+            s = new Song(mp3File, sName, artistName, albumName, art);
         } 
         else {
-            s = new Song(f, sName, artistName, albumName);
-        }
-        
+            s = new Song(mp3File, sName, artistName, albumName);
+        }        
         uploadMP3Label.setText(Helpers.uploadCheck(s));
     }
     
@@ -149,9 +148,9 @@ public class MainScreenController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends String> ov, String t, String t1) 
             {
-                selectedPlaylist = playlistView.getSelectionModel().getSelectedItem();
+                selectedPlaylist = allPlaylists.get(playlistView.getSelectionModel().getSelectedIndex());
                 
-                playlistViewLabel.setText("Selected Playlist: " + selectedPlaylist); 
+                playlistViewLabel.setText("Selected Playlist: " + selectedPlaylist.getName()); 
             }
         });
     }
