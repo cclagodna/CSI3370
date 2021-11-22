@@ -93,6 +93,7 @@ public class MainScreenController implements Initializable {
             musicPlayer.getMediaPlayer().stop();
             musicPlayer = musicPlayer.skipSong();
             TestCases.checkMusicPlayer(musicPlayer);
+            musicPlayer.getMediaPlayer().setOnError(() -> System.out.println("Error : " + musicPlayer.getMediaPlayer().getError().toString()));
         }
     }
     
