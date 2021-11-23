@@ -4,6 +4,7 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
@@ -19,11 +20,11 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="725.0" prefWidth="1024.0" stylesheets="@soundsStyle.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Sublight.Sounds.MainScreenController">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="725.0" prefWidth="970.0" stylesheets="@soundsStyle.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Sublight.Sounds.MainScreenController">
    <children>
-      <Pane layoutX="296.0" layoutY="25.0" prefHeight="699.0" prefWidth="1024.0" styleClass="mainPane" stylesheets="@soundsStyle.css" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+      <Pane layoutX="296.0" layoutY="25.0" prefHeight="600.0" prefWidth="969.0" styleClass="mainPane" stylesheets="@soundsStyle.css" AnchorPane.bottomAnchor="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="55.0" AnchorPane.topAnchor="25.0">
          <children>
-            <SplitPane layoutX="301.0" layoutY="-1.0" orientation="VERTICAL" prefHeight="701.0" prefWidth="723.0">
+            <SplitPane layoutX="301.0" layoutY="-1.0" orientation="VERTICAL" prefHeight="701.0" prefWidth="668.0">
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="732.0" prefWidth="721.0" style="-fx-border-color: black;" styleClass="mainPane" stylesheets="@soundsStyle.css">
                      <children>
@@ -78,7 +79,7 @@
                         </Label>
                       <AnchorPane layoutX="-4.0" layoutY="600.0" minHeight="0.0" minWidth="0.0" prefHeight="109.0" prefWidth="729.0" styleClass="sidebar" stylesheets="@soundsStyle.css">
                            <children>
-                              <Slider fx:id="volumeSlider" layoutX="542.0" layoutY="41.0">
+                              <Slider fx:id="volumeSlider" layoutX="486.0" layoutY="41.0">
                                  <cursor>
                                     <Cursor fx:constant="HAND" />
                                  </cursor>
@@ -156,6 +157,7 @@
                                     <Cursor fx:constant="HAND" />
                                  </cursor>
                               </ImageView>
+                              <ListView layoutX="275.0" prefHeight="274.0" prefWidth="392.0" styleClass="mainPane" stylesheets="@soundsStyle.css" />
                            </children>
                         </Pane>
                      </children>
@@ -312,6 +314,7 @@
                         <Font size="31.0" />
                      </font>
                   </Label>
+                  <ListView layoutX="39.0" layoutY="320.0" prefHeight="140.0" prefWidth="234.0" styleClass="mainPane" stylesheets="@soundsStyle.css" />
                </children>
             </Pane>
          </children></Pane>
