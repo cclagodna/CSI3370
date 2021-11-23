@@ -97,12 +97,16 @@ public class MainScreenController implements Initializable {
     private void initializeTimeSlider() {
         
         //set up the timeSlider so it has relevant and current values
-        
         mp.getPlayer().currentTimeProperty().addListener((Observable o) -> {
             updateTimeValues();
         });
+        
         // get duration of current song so it can be displayed
         mp.getPlayer().setOnReady(() -> {
+            //This will allow the time slider to go along with each song, even after making a new mediaPlayer
+            //Without this, the time bar would only move along with the first song
+            //This is a very hack-y way of going abou this, but a better solution counld not be found
+            initializeTimeSlider();
             updateTimeValues();
         });
         
@@ -110,12 +114,7 @@ public class MainScreenController implements Initializable {
         timeSlider.valueProperty().addListener((Observable o) -> {
             if(timeSlider.isValueChanging()){
                 mp.getPlayer().seek(getDuration().multiply(timeSlider.getValue()/100));
-                updateTimeValues();
             }
-        });
-        
-        mp.getPlayer().currentTimeProperty().addListener((Observable o) -> {
-            updateTimeValues();
         });
         
     }

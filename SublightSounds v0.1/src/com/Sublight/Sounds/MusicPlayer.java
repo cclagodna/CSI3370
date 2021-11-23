@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.Scanner;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
@@ -199,10 +201,10 @@ public class MusicPlayer {
             //If this isn't specified, the 'play' button would need to be clicked after every song
             newPlayer.setOnEndOfMedia(() -> nextSong());
         }
-         
+        
+        
         //Get onReady property of previous mediaPlayer
         //This property will load the song's length to the main screen
-        //FIXME: Will not update current song time to main screen
         try {
             newPlayer.setOnReady(this.player.getOnReady());
         } catch (Exception e) {
@@ -220,5 +222,4 @@ public class MusicPlayer {
     
     
     //GET AND SET ######################################################
-    
 }
