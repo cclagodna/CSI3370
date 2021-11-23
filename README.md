@@ -2,6 +2,11 @@ Roger Valade Update Log
 
 (Did work before this - will add those at a later time)
 
+11/23/21 
+1) Updated songViewInitializer() so it does not error out upon switching to the playlistView ListView.
+2) Added ImageView for Album Art.
+3) Tried adding TextField for Song Metadata viewing, does not show up right now.
+
 11/22/21
 1) Added a way for program to get previous albumArt and use that for the Song in-case it's not provided.
 2) Code cleanup - made functions like filterMacOS in Helpers that's used in multiple functions across the program. Made other similar changes like this for QOL. 
