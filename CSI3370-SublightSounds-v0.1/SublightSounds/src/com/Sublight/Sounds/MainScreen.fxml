@@ -8,7 +8,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
@@ -30,7 +29,7 @@
                      <children>
                         <ImageView fitHeight="199.0" fitWidth="191.0" layoutX="477.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../Album%20covers/Supertramp.jpg" />
+                              <Image url="@../../../../resources/Album%20covers/Supertramp.jpg" />
                            </image>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -41,7 +40,7 @@
                         </ImageView>
                         <ImageView fitHeight="199.0" fitWidth="201.0" layoutX="361.0" layoutY="75.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../Album%20covers/Chuck_Mangione,_Feels_So_Good_(1977).png" />
+                              <Image url="@../../../../resources/Album%20covers/Chuck_Mangione,_Feels_So_Good_(1977).png" />
                            </image>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -52,7 +51,7 @@
                         </ImageView>
                         <ImageView fitHeight="208.0" fitWidth="218.0" layoutX="222.0" layoutY="67.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../Album%20covers/PB.jpg" />
+                              <Image url="@../../../../resources/Album%20covers/PB.jpg" />
                            </image>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -63,7 +62,7 @@
                         </ImageView>
                         <ImageView fitHeight="218.0" fitWidth="228.0" layoutX="72.0" layoutY="56.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../Album%20covers/Daft_Punk_-_Discovery.jpg" />
+                              <Image url="@../../../../resources/Album%20covers/Daft_Punk_-_Discovery.jpg" />
                            </image>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -79,6 +78,18 @@
                         </Label>
                       <AnchorPane layoutX="-4.0" layoutY="600.0" minHeight="0.0" minWidth="0.0" prefHeight="109.0" prefWidth="729.0" styleClass="sidebar" stylesheets="@soundsStyle.css">
                            <children>
+                              <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="437.0" layoutY="33.0" pickOnBounds="true" smooth="false">
+                                 <image>
+                                    <Image url="@../../../../resources/IIcons/volume-up-line.png" />
+                                 </image>
+                                 <styleClass>
+                                    <String fx:value="sidebar-btn" />
+                                    <String fx:value="sidebar-btn" />
+                                 </styleClass>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ImageView>
                               <Slider fx:id="volumeSlider" layoutX="486.0" layoutY="41.0">
                                  <cursor>
                                     <Cursor fx:constant="HAND" />
@@ -86,7 +97,7 @@
                               </Slider>
                               <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="93.0" layoutY="48.0" pickOnBounds="true" smooth="false">
                                  <image>
-                                    <Image url="@../../../IIcons/skip-back-fill.png" />
+                                    <Image url="@../../../../resources/IIcons/skip-back-fill.png" />
                                  </image>
                                  <styleClass>
                                     <String fx:value="sidebar-btn" />
@@ -98,7 +109,7 @@
                               </ImageView>
                               <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="183.0" layoutY="48.0" pickOnBounds="true" smooth="false">
                                  <image>
-                                    <Image url="@../../../IIcons/skip-forward-fill.png" />
+                                    <Image url="@../../../../resources/IIcons/skip-forward-fill.png" />
                                  </image>
                                  <styleClass>
                                     <String fx:value="sidebar-btn" />
@@ -110,7 +121,7 @@
                               </ImageView>
                               <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="136.0" layoutY="48.0" pickOnBounds="true" smooth="false">
                                  <image>
-                                    <Image url="@../../../IIcons/pause-fill.png" />
+                                    <Image url="@../../../../resources/IIcons/pause-fill.png" />
                                  </image>
                                  <styleClass>
                                     <String fx:value="sidebar-btn" />
@@ -122,7 +133,7 @@
                               </ImageView>
                               <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="232.0" layoutY="48.0" pickOnBounds="true" smooth="false">
                                  <image>
-                                    <Image url="@../../../IIcons/repeat-line.png" />
+                                    <Image url="@../../../../resources/IIcons/repeat-line.png" />
                                  </image>
                                  <styleClass>
                                     <String fx:value="sidebar-btn" />
@@ -134,7 +145,7 @@
                               </ImageView>
                               <ImageView fitHeight="30.0" fitWidth="30.0" layoutX="53.0" layoutY="48.0" pickOnBounds="true" smooth="false">
                                  <image>
-                                    <Image url="@../../../IIcons/shuffle-line.png" />
+                                    <Image url="@../../../../resources/IIcons/shuffle-line.png" />
                                  </image>
                                  <styleClass>
                                     <String fx:value="sidebar-btn" />
@@ -144,14 +155,18 @@
                                     <Cursor fx:constant="HAND" />
                                  </cursor>
                               </ImageView>
-                              <ProgressBar layoutX="37.0" layoutY="14.0" prefHeight="18.0" prefWidth="234.0" progress="0.0" />
+                              <Slider fx:id="volumeSlider1" layoutX="38.0" layoutY="18.0" prefHeight="14.0" prefWidth="234.0">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Slider>
                            </children>
                         </AnchorPane>
                         <Pane layoutY="326.0" prefHeight="274.0" prefWidth="721.0">
                            <children>
                               <ImageView fitHeight="274.0" fitWidth="278.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../Album%20covers/beck_-_hyperspace.jpg" />
+                                    <Image url="@../../../../resources/Album%20covers/beck_-_hyperspace.jpg" />
                                  </image>
                                  <cursor>
                                     <Cursor fx:constant="HAND" />
@@ -208,7 +223,7 @@
                      <children>
                         <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" smooth="false">
                            <image>
-                              <Image url="@../../../IIcons/play-list-line.png" />
+                              <Image url="@../../../../resources/IIcons/play-list-line.png" />
                            </image>
                            <styleClass>
                               <String fx:value="sidebar-btn" />
@@ -229,7 +244,7 @@
                      <children>
                         <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" smooth="false">
                            <image>
-                              <Image url="@../../../IIcons/album-fill.png" />
+                              <Image url="@../../../../resources/IIcons/album-fill.png" />
                            </image>
                            <styleClass>
                               <String fx:value="sidebar-btn" />
@@ -250,7 +265,7 @@
                      <children>
                         <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" smooth="false">
                            <image>
-                              <Image url="@../../../IIcons/user-fill.png" />
+                              <Image url="@../../../../resources/IIcons/user-fill.png" />
                            </image>
                            <styleClass>
                               <String fx:value="sidebar-btn" />
@@ -271,7 +286,7 @@
                      <children>
                         <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" smooth="false">
                            <image>
-                              <Image url="@../../../IIcons/speaker-fill.png" />
+                              <Image url="@../../../../resources/IIcons/speaker-fill.png" />
                            </image>
                            <styleClass>
                               <String fx:value="sidebar-btn" />
@@ -292,7 +307,7 @@
                      <children>
                         <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" smooth="false">
                            <image>
-                              <Image url="@../../../IIcons/heart-fill.png" />
+                              <Image url="@../../../../resources/IIcons/heart-fill.png" />
                            </image>
                            <styleClass>
                               <String fx:value="sidebar-btn" />
