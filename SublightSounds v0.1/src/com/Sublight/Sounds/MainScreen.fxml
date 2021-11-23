@@ -22,6 +22,9 @@
       <Button layoutX="21.0" layoutY="187.0" mnemonicParsing="false" onAction="#btnUploadClicked" prefHeight="27.0" prefWidth="96.0" text="Upload MP3" />
       <Slider fx:id="volumeSlider" layoutX="518.0" layoutY="172.0" orientation="VERTICAL" />
       <Label fx:id="uploadMP3Label" layoutX="128.0" layoutY="192.0" prefHeight="27.0" prefWidth="242.0" text="Upload Status: N/A" />
+      <Slider fx:id="timeSlider" layoutX="230.0" layoutY="271.0" />
+      <Label fx:id="totalTimeDisplay" layoutX="377.0" layoutY="270.0" text="Label" />
+      <Label fx:id="currentTimeDisplay" layoutX="189.0" layoutY="270.0" text="Label" />
       
       <!-- Delete code below and create button using SceneBuilder that runs #btnSkipSong when clicked -->
       <Button layoutX="28" layoutY="320" mnemonicParsing="false" onAction="#btnSkipSong" prefHeight="27.0" prefWidth="96.0" text=">>" />

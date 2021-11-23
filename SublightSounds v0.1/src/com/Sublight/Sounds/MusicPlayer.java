@@ -4,10 +4,15 @@
 package com.Sublight.Sounds;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 /*
 This is a helper class that allows us to make an object
@@ -24,9 +29,12 @@ public class MusicPlayer {
     //ArrayList of songs in song folder, could be removed?
     ArrayList<File> files = new ArrayList(Arrays.asList(songFolder.listFiles()));
     //The current song file the MediaPlayer is playing
-    //private Song currSong;
     private File currSong;
-    //Current playlist the MediaPlayer is itrating over
+    //Get file holding all playlists
+    private final File playlistFolder = new File("resources" + p + "Playlists");
+    //ArrayList of playlists in playlist folder, could be removed?
+    ArrayList<File> playlists = new ArrayList(Arrays.asList(playlistFolder.listFiles()));
+    //Current playlist the MediaPlayer is iterating over
     private Playlist currPlaylist;
     //String designating file path of currSong. Will only update in setSong()
     private String path;
@@ -43,7 +51,6 @@ public class MusicPlayer {
         setPath();
         setMedia();
         setPlayer();
-        player.setOnEndOfMedia(() -> nextSong());
     }
     
     public MusicPlayer(String pathname) {
@@ -51,7 +58,6 @@ public class MusicPlayer {
         setPath();
         setMedia();
         setPlayer();
-        player.setOnEndOfMedia(() -> nextSong());
     }
     
     //CONSTRUCTORS #####################################################
@@ -97,6 +103,7 @@ public class MusicPlayer {
     public void updateMusicPlayer(File f) {
         this.currSong = f;
         setPath();
+        //New media object must be set before a new mediaPlayer
         setMedia();
         setPlayer();
         //Print confirmation message to console
@@ -109,7 +116,7 @@ public class MusicPlayer {
     
     //FUNCTIONS ########################################################
     //GET AND SET ######################################################
-        //These get and set methods could be organized better
+        //These get and set methods could be organized better (alphabetical?)
     
     //Sets the player to a new song
     //Funnels into updateMusicPlayer() function
@@ -165,15 +172,52 @@ public class MusicPlayer {
         return player;
     }
     
-    //Creates new MediaPlayer to be used with new Media
-    //AUTOPLAYS SONGS WHEN PROGRAM LOADS, NEEDS TO BE FIXED
-    private void setPlayer() {
-        //System.out.println(newPlayer.getStatus());
-        this.player = new MediaPlayer(getMedia());
-        //This line allows the MediaPlayer to continue to next song in list
-        //If this isn't specified, the 'play' button would need to be clicked after every song
-        player.setOnEndOfMedia(() -> nextSong());
+    //Alternate name for getPlayer()
+    public MediaPlayer getMediaPlayer() {
+        return getPlayer();
     }
+    
+    //Creates new MediaPlayer to be used with new Media
+    //If the mediaPlayer has any special properties, must be assigned here
+    public void setPlayer() {
+        
+        MediaPlayer newPlayer = new MediaPlayer(getMedia());
+        //Get volume property of previous media player
+        try {
+            newPlayer.setVolume(this.player.getVolume());
+        } catch(Exception e){
+            //If player doesn't have a volume (such as during program initialization), set value to 1 (max)
+            newPlayer.setVolume(1.0);
+        }
+        
+        //Get onEndOfMedia property of previous mediaPlayer
+        //This property should run code allowing player to go to next song
+        try {
+            newPlayer.setOnEndOfMedia(this.player.getOnEndOfMedia());
+        } catch (Exception e) {
+            //This line allows the MediaPlayer to continue to next song in list
+            //If this isn't specified, the 'play' button would need to be clicked after every song
+            newPlayer.setOnEndOfMedia(() -> nextSong());
+        }
+         
+        //Get onReady property of previous mediaPlayer
+        //This property will load the song's length to the main screen
+        //FIXME: Will not update current song time to main screen
+        try {
+            newPlayer.setOnReady(this.player.getOnReady());
+        } catch (Exception e) {
+            //...
+        }
+        
+        
+        //Set mediaPlayer to newly defined player
+        setPlayer(newPlayer);
+    }
+    
+    public void setPlayer(MediaPlayer mp) {
+        this.player = mp;
+    }
+    
     
     //GET AND SET ######################################################
     

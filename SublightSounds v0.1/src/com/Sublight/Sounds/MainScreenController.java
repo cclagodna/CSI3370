@@ -10,6 +10,8 @@ import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.NotSupportedException;
 import com.mpatric.mp3agic.UnsupportedTagException;
+import com.sun.javafx.property.adapter.PropertyDescriptor;
+import com.sun.javafx.property.adapter.PropertyDescriptor.Listener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -24,8 +26,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Duration;
 
 /**
  * FXML Controller class
@@ -38,7 +42,7 @@ public class MainScreenController implements Initializable {
     use /, while WindowsOS use \.
     */
     public String p = System.getProperty("file.separator"); 
-    public MusicPlayer mp;
+    public static MusicPlayer mp;
     
     public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
     
@@ -52,34 +56,69 @@ public class MainScreenController implements Initializable {
     private TextField albumNameText;
     @FXML
     private Label uploadMP3Label;
+    @FXML 
+    private Label totalTimeDisplay;
+    @FXML
+    private Label currentTimeDisplay;
     @FXML
     private Slider volumeSlider;
+    @FXML
+    private Slider timeSlider;
     @FXML
     private Button btnSkip;
     
     /**
      * Initializes the controller class.
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //Initialize MediaPlayer object with a base song
-        //musicPlayer = new MusicPlayer("resources" + p + "rickroll.mp3");
+        //Initialize MediaPlayer object
         mp = new MusicPlayer();
-        //mp = musicPlayer.getMediaPlayer();
         
         uploadText.setEditable(false);
         
-        //Create VolumeSlider object, allowing the user to control the output volume of the player
-        volumeSlider.setValue(mp.getPlayer().getVolume() *100);
-        volumeSlider.valueProperty().addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable o) {
-                mp.getPlayer().setVolume(volumeSlider.getValue() /100);
-                  } 
-       });
+        initializeVolumeSlider();
         
+        initializeTimeSlider();
+        
+        updateTimeValues();
     }    
 
+    //Create VolumeSlider object, allowing the user to control the output volume of the player
+    private void initializeVolumeSlider() {
+        volumeSlider.setValue(mp.getPlayer().getVolume() *100);
+        volumeSlider.valueProperty().addListener((Observable o) -> {
+            mp.getPlayer().setVolume(volumeSlider.getValue() /100);
+        });
+    }
+    
+    private void initializeTimeSlider() {
+        
+        //set up the timeSlider so it has relevant and current values
+        
+        mp.getPlayer().currentTimeProperty().addListener((Observable o) -> {
+            updateTimeValues();
+        });
+        // get duration of current song so it can be displayed
+        mp.getPlayer().setOnReady(() -> {
+            updateTimeValues();
+        });
+        
+        //make scrubbing possible for timeSlider
+        timeSlider.valueProperty().addListener((Observable o) -> {
+            if(timeSlider.isValueChanging()){
+                mp.getPlayer().seek(getDuration().multiply(timeSlider.getValue()/100));
+                updateTimeValues();
+            }
+        });
+        
+        mp.getPlayer().currentTimeProperty().addListener((Observable o) -> {
+            updateTimeValues();
+        });
+        
+    }
     
     //TODO Add a button that runs this code
     @FXML
@@ -190,4 +229,40 @@ public class MainScreenController implements Initializable {
         }
     }
     
+    //update the timeLabels and timeSlider to current song time location values
+    public void updateTimeValues(){
+        updateTimeValues(mp.getPlayer().getCurrentTime(), mp.getMedia().getDuration());
+    }
+    
+    public void updateTimeValues(Duration curr, Duration total) {
+        if (curr == null || curr.isUnknown() || total == null || total.isUnknown()) return;
+        totalTimeDisplay.setText(formatDuration(total));
+        currentTimeDisplay.setText(formatDuration(curr));
+        timeSlider.setValue(curr.divide(total).toMillis() * 100);
+    }
+    
+    //format duration into readable time for songs
+    public String formatDuration(Duration d){
+        double seconds = d.toSeconds();
+        int absSeconds = (int)(seconds);
+        String returner = String.format("%d:%02d",
+                (absSeconds / 60), (absSeconds % 60));
+        return returner;
+    }
+    
+    
+    public Duration getDuration() {
+        return mp.getMedia().getDuration();
+    }
+    
+    public Duration getCurrentTime() {
+        return mp.getPlayer().getCurrentTime();
+    }
+    
+    
+    public void getListener() {
+        mp.getPlayer().currentTimeProperty().addListener((Observable o) -> {
+            this.updateTimeValues();
+        });
+    }
 }
