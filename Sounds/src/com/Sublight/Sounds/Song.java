@@ -3,6 +3,8 @@ package com.Sublight.Sounds;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import javafx.scene.image.Image;
@@ -78,9 +80,10 @@ public class Song
         this.albumArt = albumArt;
     }
     
-    public Image albumArtToJFX() 
+    public Image albumArtToJFX() throws FileNotFoundException 
     {
-        return new Image((this.albumArt).getAbsolutePath());
+        FileInputStream input = new FileInputStream(this.albumArt.getAbsolutePath());
+        return new Image(input);
     }
     
     // This is checking whether the song MP3 file still exists or not.

@@ -1,6 +1,7 @@
 package com.Sublight.Sounds;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -12,6 +13,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 /**
  * FXML Controller class
@@ -27,6 +32,7 @@ public class MainScreenController implements Initializable {
     */
     public String p = System.getProperty("file.separator"); 
     public MusicPlayer musicPlayer;
+    public MusicPlayer oldPlayer;
     
     public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
     public Playlist selectedPlaylist;
@@ -55,6 +61,12 @@ public class MainScreenController implements Initializable {
     @FXML
     private Label songViewLabel;
     
+    @FXML
+    private TextFlow songInfo;
+    
+    @FXML
+    private ImageView albumArtView;
+    
     /**
      * Initializes the controller class.
      */
@@ -68,9 +80,52 @@ public class MainScreenController implements Initializable {
     }    
 
     // this is the function for the play button
+    
+    // TODO BUG FIX: Switch to a Song, Play, Select Other Song, then go Back to Playing Song, Press Play = : (
     @FXML
-    private void btnPlayClicked(ActionEvent event) {
+    private void btnPlayClicked(ActionEvent event) throws FileNotFoundException 
+    {
+       if (( selectedSong != null) && (selectedPlaylist != null)) 
+       {
+            if (!musicPlayer.getCurrentSong().equals(selectedSong) &&
+            !musicPlayer.getCurrentPlaylist().equals(selectedPlaylist)) 
+            {
+                System.out.println("Here 1");
+                musicPlayer.getMediaPlayer().stop();
+                musicPlayer = musicPlayer.changeSong(selectedSong, selectedPlaylist);
+            } 
+            else if (!musicPlayer.getCurrentSong().equals(selectedSong) &&
+                   musicPlayer.getCurrentPlaylist().equals(selectedPlaylist)) 
+            {
+                System.out.println("Here 2");
+                System.out.println("Current Song: " + musicPlayer.getCurrentSong().getSongName());
+                System.out.println("Selected Song: " + selectedSong.getSongName());
+                System.out.println("Current Playlist: " + musicPlayer.getCurrentPlaylist().getName());
+                System.out.println("Selected Playlist: " + selectedPlaylist.getName());
+                musicPlayer.getMediaPlayer().stop();
+                musicPlayer = musicPlayer.changeSong(selectedSong, selectedPlaylist);
+            }
+            else if (musicPlayer.getCurrentSong().equals(selectedSong) &&
+                     !musicPlayer.getCurrentPlaylist().equals(selectedPlaylist)) 
+            {
+                System.out.println("Here 3");
+                //selectedPlaylist = musicPlayer.getCurrentPlaylist();
+                return; // we want to make sure it doesn't play the song over again
+            }
+       }
        musicPlayer.getMediaPlayer().play();
+       if (selectedSong != null) 
+       {
+           System.out.println("Here 1 Song Info");
+           songInfoInitializer(selectedSong);
+           albumArtInitializer(selectedSong);
+       } 
+       else 
+       {
+           System.out.println("Here 2 Song Info");
+           songInfoInitializer(musicPlayer.getCurrentSong());
+           albumArtInitializer(musicPlayer.getCurrentSong());
+       }
     }
     
     // this is the function for the pause button
@@ -92,6 +147,8 @@ public class MainScreenController implements Initializable {
         {
             musicPlayer.getMediaPlayer().stop();
             musicPlayer = musicPlayer.skipSong();
+            selectedSong = musicPlayer.getCurrentSong();
+            selectedPlaylist = musicPlayer.getCurrentPlaylist();
             TestCases.checkMusicPlayer(musicPlayer);
             musicPlayer.getMediaPlayer().setOnError(() -> System.out.println("Error : " + musicPlayer.getMediaPlayer().getError().toString()));
         }
@@ -159,6 +216,7 @@ public class MainScreenController implements Initializable {
                 songViewInitializer();
             }
         });
+        //playlistView.getSelectionModel().selectedIndexProperty().removeListener(cl);
     }
     
     // this is not quite done yet, but is a start.
@@ -177,12 +235,40 @@ public class MainScreenController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends String> ov, String t, String t1) 
             {
-                selectedSong = selectedPlaylist.getPlaylist().get(songView.getSelectionModel().getSelectedIndex());
-                musicPlayer.setCurrentSong(selectedSong);
-                songViewLabel.setText("Selected Song: " + selectedSong.getSongName());
-                musicPlayer = musicPlayer.changeSong(selectedSong, selectedPlaylist);
+                if (songView.getSelectionModel().getSelectedIndex() >= 0) 
+                {
+                    selectedSong = selectedPlaylist.getPlaylist().get(songView.getSelectionModel().getSelectedIndex());
+                    songViewLabel.setText("Selected Song: " + selectedSong.getSongName());
+                } else { // this is to accomodate when switching back to playlist ListView
+                    selectedSong = null;
+                    songViewLabel.setText("Selected Song: N/A");
+                }
             }
         });
+    }
+    
+    public void songInfoInitializer(Song s) 
+    {
+        Text songName = new Text("Song Name: " + s.getSongName());
+        Text artistName = new Text("Artist Name: " + s.getArtistName());
+        Text albumName = new Text("Album Name: " + s.getAlbumName());
+        songInfo = new TextFlow(songName, artistName, albumName);
+        songInfo.setLineSpacing(2.0);
+    }
+    
+    public void albumArtInitializer(Song s) throws FileNotFoundException 
+    {
+        if (s.getAlbumArt() != null) 
+        {
+            Image albumImage = s.albumArtToJFX();
+            albumArtView.setImage(albumImage);
+            albumArtView.setPreserveRatio(true);
+        }
+        else if ((albumArtView.getImage() != null) &&
+                  !(s.getAlbumArt() != null)) 
+        {
+            albumArtView.setImage(null);
+        }
     }
     
 }
