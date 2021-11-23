@@ -1,7 +1,6 @@
 package com.Sublight.Sounds;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -31,12 +30,11 @@ public class MainScreenController implements Initializable {
     use /, while WindowsOS use \.
     */
     public String p = System.getProperty("file.separator"); 
-    public MusicPlayer musicPlayer;
-    public MusicPlayer oldPlayer;
+    public MusicPlayer musicPlayer; // our musicplayer that's used throughout the program
     
-    public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
-    public Playlist selectedPlaylist;
-    public Song selectedSong;
+    public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>(); // an arraylist of all playlists in our program
+    public Playlist selectedPlaylist; // selected playlist based off of what's selected in playlist ListView
+    public Song selectedSong; // selected song based off of what's selected in song ListView
     
     @FXML
     private TextField uploadText;
@@ -73,47 +71,43 @@ public class MainScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         musicPlayer = new MusicPlayer();
-        uploadText.setEditable(false);
-        albumArtText.setEditable(false);
-        allPlaylists = Helpers.onStartLoadPlaylists();
-        playlistViewInitializer();
+        uploadText.setEditable(false); // making it so we can't edit mp3file textfield
+        albumArtText.setEditable(false); // making it so we can't edit albumartFile textfield
+        allPlaylists = Helpers.onStartLoadPlaylists(); // load the playlists at the beginning of the program
+        playlistViewInitializer(); // load the playlist ListView at beginning of the program
     }    
 
     // this is the function for the play button
-    
-    // TODO BUG FIX: Switch to a Song, Play, Select Other Song, then go Back to Playing Song, Press Play = : (
     @FXML
-    private void btnPlayClicked(ActionEvent event) throws FileNotFoundException 
+    private void btnPlayClicked(ActionEvent event) 
     {
-       if (( selectedSong != null) && (selectedPlaylist != null)) 
+       // if the user has selected a song and playlist
+       if ((selectedSong != null) && (selectedPlaylist != null)) 
        {
+            //if the selected song and playlist is not equal to the music players current song and playlist
             if (!musicPlayer.getCurrentSong().equals(selectedSong) &&
             !musicPlayer.getCurrentPlaylist().equals(selectedPlaylist)) 
             {
-                System.out.println("Here 1");
-                musicPlayer.getMediaPlayer().stop();
-                musicPlayer = musicPlayer.changeSong(selectedSong, selectedPlaylist);
-            } 
-            else if (!musicPlayer.getCurrentSong().equals(selectedSong) &&
-                   musicPlayer.getCurrentPlaylist().equals(selectedPlaylist)) 
-            {
-                System.out.println("Here 2");
-                System.out.println("Current Song: " + musicPlayer.getCurrentSong().getSongName());
-                System.out.println("Selected Song: " + selectedSong.getSongName());
-                System.out.println("Current Playlist: " + musicPlayer.getCurrentPlaylist().getName());
-                System.out.println("Selected Playlist: " + selectedPlaylist.getName());
                 musicPlayer.getMediaPlayer().stop();
                 musicPlayer = musicPlayer.changeSong(selectedSong, selectedPlaylist);
             }
+            // if the selected song is not the music players current song, but in the same playlist
+            else if (!musicPlayer.getCurrentSong().equals(selectedSong) &&
+                   musicPlayer.getCurrentPlaylist().equals(selectedPlaylist)) 
+            {
+                musicPlayer.getMediaPlayer().stop();
+                musicPlayer = musicPlayer.changeSong(selectedSong, selectedPlaylist);
+            }
+            // if the song is the same but in a different playlist
             else if (musicPlayer.getCurrentSong().equals(selectedSong) &&
                      !musicPlayer.getCurrentPlaylist().equals(selectedPlaylist)) 
             {
-                System.out.println("Here 3");
                 //selectedPlaylist = musicPlayer.getCurrentPlaylist();
                 return; // we want to make sure it doesn't play the song over again
             }
        }
        musicPlayer.getMediaPlayer().play();
+       // show any album art and metadata associated with the song chosen
        if (selectedSong != null) 
        {
            System.out.println("Here 1 Song Info");
@@ -122,7 +116,6 @@ public class MainScreenController implements Initializable {
        } 
        else 
        {
-           System.out.println("Here 2 Song Info");
            songInfoInitializer(musicPlayer.getCurrentSong());
            albumArtInitializer(musicPlayer.getCurrentSong());
        }
@@ -140,6 +133,7 @@ public class MainScreenController implements Initializable {
         musicPlayer.getMediaPlayer().stop();
     }
     
+    // this is the function for the skip button, skips to next song in current playlist
     @FXML
     void btnSkipClicked(ActionEvent event) 
     {
@@ -149,7 +143,7 @@ public class MainScreenController implements Initializable {
             musicPlayer = musicPlayer.skipSong();
             selectedSong = musicPlayer.getCurrentSong();
             selectedPlaylist = musicPlayer.getCurrentPlaylist();
-            TestCases.checkMusicPlayer(musicPlayer);
+            // outputs any errors with the mp3 files
             musicPlayer.getMediaPlayer().setOnError(() -> System.out.println("Error : " + musicPlayer.getMediaPlayer().getError().toString()));
         }
     }
@@ -182,29 +176,31 @@ public class MainScreenController implements Initializable {
         String artistName = artistNameText.getText();
         String albumName = albumNameText.getText();
         Song s;
+        // this checks if there's already album art found for the specified artist & album
         File albumArtFile = Helpers.checkForAlbumCover(sName, artistName);
         if (albumArtFile != null) {
             s = new Song(mp3File, sName, artistName, albumName, albumArtFile);
         } 
-        else if (albumArtText.getText() != null) 
+        else if (albumArtText.getText() != null) // else if there's no album art found in program
         {
             File art = new File(albumArtText.getText());
             s = new Song(mp3File, sName, artistName, albumName, art);
         } 
-        else {
+        else { // else there's no album art provided
             s = new Song(mp3File, sName, artistName, albumName);
         }        
         uploadMP3Label.setText(Helpers.uploadCheck(s));
     }
     
-    // not quite done yet, but is a start.
+    // initializes the playlistView ListView with all playlists stored in the program.
     public void playlistViewInitializer() 
     {
         ArrayList<String> playlistNames = new ArrayList<String>();
         for (Playlist p : allPlaylists) {
             playlistNames.add(p.getName());
         }
-        playlistView.getItems().addAll(playlistNames);
+        playlistView.getItems().addAll(playlistNames); // add playlist names to playlist ListView
+        // adding a listener that updates selectedPlaylist when selection is changed
         playlistView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() 
         {
             @Override
@@ -212,16 +208,17 @@ public class MainScreenController implements Initializable {
             {
                 selectedPlaylist = allPlaylists.get(playlistView.getSelectionModel().getSelectedIndex());
                 musicPlayer.setCurrentPlaylist(selectedPlaylist);
-                playlistViewLabel.setText("Selected Playlist: " + selectedPlaylist.getName()); 
+                playlistViewLabel.setText("Selected Playlist: " + selectedPlaylist.getName());
+                // update the songs ListView based on the given playlist
                 songViewInitializer();
             }
         });
-        //playlistView.getSelectionModel().selectedIndexProperty().removeListener(cl);
     }
     
-    // this is not quite done yet, but is a start.
+    // this shows all the songs in the selected Playlist.
     public void songViewInitializer() 
     {
+        // clear the songView ListView if there's already stuff in there
         if (songView.getItems() != null) {
             songView.getItems().clear();
         }
@@ -235,6 +232,7 @@ public class MainScreenController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends String> ov, String t, String t1) 
             {
+                // this if statement is here in-case we select something from the playlistView
                 if (songView.getSelectionModel().getSelectedIndex() >= 0) 
                 {
                     selectedSong = selectedPlaylist.getPlaylist().get(songView.getSelectionModel().getSelectedIndex());
@@ -247,6 +245,7 @@ public class MainScreenController implements Initializable {
         });
     }
     
+    // this should put the songs Metadata into a TextFlow object
     public void songInfoInitializer(Song s) 
     {
         Text songName = new Text("Song Name: " + s.getSongName());
@@ -256,7 +255,8 @@ public class MainScreenController implements Initializable {
         songInfo.setLineSpacing(2.0);
     }
     
-    public void albumArtInitializer(Song s) throws FileNotFoundException 
+    // this makes it so album art appears in an ImageView if there's album art associated with provided song
+    public void albumArtInitializer(Song s)
     {
         if (s.getAlbumArt() != null) 
         {

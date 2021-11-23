@@ -7,6 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.image.Image;
 
 /**
@@ -23,6 +25,7 @@ public class Song
     private String albumName; // album name
     private File albumArt; // album Image
     
+    // constructor for song w/o albumArt Image
     public Song(File location, String song, String artist, String album) 
     {
         this.mp3Location = location;
@@ -31,6 +34,7 @@ public class Song
         this.albumName = album;
     }
     
+    // constructor for song w/ albumArt Image
     public Song(File location, String song, String artist, String album, File image) 
     {
         this.mp3Location = location;
@@ -39,50 +43,66 @@ public class Song
         this.albumName = album;
         this.albumArt = image;
     }
-
+    
+    // mp3Location getter
     public File getmp3Location() {
         return mp3Location;
     }
-
+    
+    // songName getter
     public String getSongName() {
         return songName;
     }
-
+    
+    // artistName getter
     public String getArtistName() {
         return artistName;
     }
 
+    // albumName getter
     public String getAlbumName() {
         return albumName;
     }
-
+    
+    // albumArt getter
+    public File getAlbumArt() {
+        return albumArt;
+    }
+    
+    // mp3Location setter
     public void setmp3Location(File location) {
         this.mp3Location = location;
     }
 
+    // songName setter
     public void setSongName(String songName) {
         this.songName = songName;
     }
 
+    // artistName setter
     public void setArtistName(String artistName) {
         this.artistName = artistName;
     }
 
+    // albumName setter
     public void setAlbumName(String albumName) {
         this.albumName = albumName;
     }
     
-    public File getAlbumArt() {
-        return albumArt;
-    }
-
+    // albumArt setter
     public void setAlbumArt(File albumArt) {
         this.albumArt = albumArt;
     }
     
-    public Image albumArtToJFX() throws FileNotFoundException 
+    // this converts our albumArt file into a JavaFX Image
+    public Image albumArtToJFX()
     {
-        FileInputStream input = new FileInputStream(this.albumArt.getAbsolutePath());
+        FileInputStream input = null;
+        try {
+            input = new FileInputStream(this.albumArt.getAbsolutePath());
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Song.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return new Image(input);
     }
     

@@ -5,6 +5,11 @@ import java.util.ArrayList;
 
 public class TestCases 
 {
+    /*
+    These are just some test cases that we have used at some point in the programs life.
+    They might not be relevant anymore if we've changed ways these functions have worked.
+    These were mostly for bug testing.
+    */
     public static void playlistOneSong() 
     {
         Playlist p = new Playlist("TestPlaylist");
