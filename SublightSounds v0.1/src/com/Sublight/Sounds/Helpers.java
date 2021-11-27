@@ -8,102 +8,106 @@ import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import javafx.stage.FileChooser;
 
-public class Helpers 
+public class Helpers
 {
     public final static String p = System.getProperty("file.separator");
     public static String songResourcePath = "Resources" + p + "Songs" + p;
+    public static String uploadSongPath = "resources" + p + "Songs" + p;
+    public static String uploadImagePath = "resources" + p + "Albums" + p;
     //Stores message about the status of upload functionality
     static String uploadStatus = "";
     
+    public static Boolean uploadFile(Song s) throws IOException, UnsupportedTagException, InvalidDataException {
+        return uploadFile(new File(s.getMP3Location()));
+    }
     
-    public static String uploadFile(File origFile) throws IOException, UnsupportedTagException, InvalidDataException {
+    public static Boolean uploadFile(File origFile) throws IOException, UnsupportedTagException, InvalidDataException {
         return uploadFile(origFile, songResourcePath);
     }
     
-    //Move a selected file to a target directory.
-    public static String uploadFile(File f, String newLoc) throws IOException, UnsupportedTagException, InvalidDataException
+    public static boolean uploadFile(File origFile, String newLoc) 
     {
-        //Current location of file
-        Path oldPath = Paths.get(f.getAbsolutePath());
-        //Desired location of file, must append f.getName() or else errors arise
-        Path newPath = Paths.get(newLoc + f.getName());
-        
-        boolean canUpload = uploadCheck(f, newLoc);
-        
-        //If file can be uploaded
-        if (canUpload) try {
-            //Moves file to new path, replacing existing file of same name (if that exists)
+        Path oldPath = Paths.get(origFile.getAbsolutePath());
+        Path newPath = Paths.get(newLoc);
+        try {
             Files.move(oldPath, newPath, REPLACE_EXISTING);
-            //If the file should be copied instead of just moved
-            //Files.copy(oldPath, newPath, REPLACE_EXISTING);
         } catch (IOException ex) {
             Logger.getLogger(Helpers.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        //File cant be uploaded, return error message
-        else return uploadStatus;
-        
-        //Set uploadStatus to a success message
-        setUploadStatus("MP3 Uploaded Successfully!");
-        return uploadStatus;
+        return true;
     }
     
-   
-    // This function is used to make sure all the details of mp3 are included in the file upload.
-    // Any reason to deny an upload (wrong file type, missing metadata, etc) should be designated here
-    public static boolean uploadCheck(File f, String path) throws IOException, UnsupportedTagException, InvalidDataException 
+    // This function is used to make sure all the details of Song are included in the file upload.
+    public static String uploadCheck(Song s) 
     {
-        //Extract ID3 information from mp3
-        //Any file passed to this method SHOULD be an mp3 with an ID3v2 tag
-        ID3v2 tag = new Mp3File(f).getId3v2Tag();
-        //Retrive song name
-        String sName = tag.getTitle();
-        //Retrieve artist name
-        String artistName = tag.getArtist();
-        //Retrive album name
-        String albumName = tag.getAlbum();
+        File f = s.getmp3Location();
+        String sName = s.getSongName();
+        String artistName = s.getArtistName();
+        String albumName = s.getAlbumName();
+        File image = s.getAlbumArt();
         
-        if ( !f.exists() ) {
-            setUploadStatus("No MP3 File to upload!");
-            return false;
+        if (f.exists()) 
+        {
+            if (sName != null) 
+            {
+                if (artistName != null) 
+                {
+                    if (albumName != null) 
+                    {
+                        String mp3filepath = uploadSongPath + sName + "+" + artistName + ".mp3";
+                        File newFileLoc = new File(mp3filepath);
+                        Song temp;
+                        if (Helpers.checkForAlbumCover(artistName, albumName) != null) 
+                        {
+                            File existingAlbumArt = Helpers.checkForAlbumCover(artistName, albumName);
+                            temp = new Song(newFileLoc, sName, artistName, albumName, existingAlbumArt);
+                            temp.createJSONFile(temp);
+                            System.out.println("Album Art already detected.");
+                        }
+                        else if (image != null) 
+                        {
+                            File oldImageLoc = new File(s.getAlbumArt().getAbsolutePath()); // getting the File of the Image
+                            int dot = oldImageLoc.getAbsolutePath().lastIndexOf(".");
+                            String imageExt = oldImageLoc.getAbsolutePath().substring(dot, oldImageLoc.getAbsolutePath().length()); // getting the image extension
+                            String albumArtPath = uploadImagePath + artistName + "+" + albumName + imageExt;
+                            File newArtLoc = new File(albumArtPath);
+                            Helpers.uploadFile(oldImageLoc, albumArtPath); // uploading the albumArt to its respective folder
+                            temp = new Song(newFileLoc, sName, artistName, albumName, newArtLoc);
+                            temp.createJSONFile(temp);
+                            System.out.println("No Album Art previously detected - using provided image.");
+                        } 
+                        else 
+                        {
+                            temp = new Song(newFileLoc, sName, artistName, albumName);
+                            temp.createJSONFile(temp);
+                            System.out.println("No album art previously detected or provided.");
+                        }
+                        Helpers.uploadFile(f, mp3filepath);
+                        return "MP3 Uploaded Successfully!";
+                    } else {
+                        return "No Album specified!";
+                    }
+                } else {
+                    return "No Artist specified!";
+                }
+            } else {
+                return "No Song Name specified!";
+            }
+        } else {
+            return "No MP3 File to upload!";
         }
-        
-        //If file does not have extension .mp3
-        if (!f.getName().endsWith(".mp3")){
-            setUploadStatus("This file is not an mp3!");
-            return false;
-        }
-        
-        if ( sName == null ) {
-            setUploadStatus("No Song Name Specified!");
-            return false;
-        }
-        
-        if ( artistName == null ) {
-            setUploadStatus("No Artist Name Specified!");
-            return false;
-        }
-        
-        if ( albumName == null ) {
-            setUploadStatus("No Album Name Specified!");
-            return false;
-        }
-        
-        if (!(new File(path)).exists()) {
-            setUploadStatus("Desired copy path doesn't exist!");
-            return false;
-        }
-        
-        setUploadStatus("MP3 viable for upload");
-        return true;
     }
     
     /* This converts file paths between Mac and Windows so the program can load
@@ -128,5 +132,80 @@ public class Helpers
     
     public static String getUploadStatus() {
         return uploadStatus;
+    }
+    
+    // this will be called when choosing a file for album art
+    public static File imageFileChooser() 
+    {
+        FileChooser choose = new FileChooser();
+        choose.setTitle("Uploading Album Art");
+        choose.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.jpg", "*.jpeg", "*.png", "*.bmp", "*.gif"));
+        File f = choose.showOpenDialog(null);
+        return f;
+    }
+    
+    public static File mp3FileChooser() 
+    {
+        FileChooser choose = new FileChooser();
+        choose.setTitle("Uploading MP3");
+        choose.getExtensionFilters().add(new FileChooser.ExtensionFilter("Audio Files", "*.mp3"));
+        File f = choose.showOpenDialog(null);
+        return f;
+    }
+    
+    public static ArrayList<Playlist> onStartLoadPlaylists() 
+    {
+        ArrayList<Playlist> list = new ArrayList<Playlist>();
+        ArrayList<Playlist> playlists = Playlist.loadPlaylists();
+        if (!playlists.isEmpty()) 
+        {
+            for (Playlist p : playlists) {
+                list.add(p);
+            }
+        }
+        return list;
+    }
+    
+    // this checks during uploading a song if there's album art already specified for the artist and album.
+    public static File checkForAlbumCover(String artist, String album) 
+    {
+        File value = null;
+        File f = new File("resources" + p + "Albums");
+        if (f.exists() && f.isDirectory()) 
+        {
+            if (f.length() > 0) // getting the files of the playlist folder (minus DS_Store files)
+            {
+                File[] dirContents = Helpers.filterMacOS(f);
+                for (File temp : dirContents) // for all files in the playlists folder
+                {
+                    if (temp.isFile()) // if the file is a file rather than a directory.
+                    {
+                        int extension = temp.getName().lastIndexOf(".");
+                        String filename = temp.getName().substring(0, extension); // removing extension from file name
+                        String[] parts = filename.split(Pattern.quote("+")); // splitting the string by artist and album name
+                        if (parts[0].equalsIgnoreCase(artist) && parts[1].equalsIgnoreCase(album)) // if the provided artist & album are the same as current file
+                        {
+                            value = temp; // set the return value equal to this file
+                            return value;
+                        }
+                    }
+                }
+            }
+        } else {
+            System.out.println("Albums directory not found, cannot check album covers.");
+        }
+        return value;
+    }
+    
+    // this removes any .DS_Store files from specified directory.
+    public static File[] filterMacOS(File f) 
+    {
+        File[] dirContents = f.listFiles(new FilenameFilter() { 
+        @Override
+        public boolean accept(File file, String string) {
+            return !string.equals(".DS_Store");
+            }
+        }); 
+        return dirContents;
     }
 }

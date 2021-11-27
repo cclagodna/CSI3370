@@ -5,8 +5,12 @@ package com.Sublight.Sounds;
 
 import com.google.gson.Gson;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.image.Image;
 import javafx.scene.media.Media;
 
@@ -33,8 +37,8 @@ public class Song
     private String artistName;
     //Song album's name
     private String albumName;
-    //Song album art
-    private Image albumArt;
+    //Image of album
+    private File albumArt;
     
     
     //CONSTRUCTORS #####################################################
@@ -50,6 +54,7 @@ public class Song
         this.songName = location.toString();
         this.artistName = "NotFound";
         this.albumName = "NotFound";
+
     }
     
     //Song File, name, artist, album
@@ -59,6 +64,17 @@ public class Song
         this.songName = name;
         this.artistName = artist;
         this.albumName = album;
+        this.albumArt = null;
+    }
+    
+    // constructor for song w/ albumArt Image
+    public Song(File location, String song, String artist, String album, File image) 
+    {
+        this.mp3Location = location;
+        this.songName = song;
+        this.artistName = artist;
+        this.albumName = album;
+        this.albumArt = image;
     }
     
     //CONSTRUCTORS #####################################################
@@ -77,6 +93,10 @@ public class Song
 
     public String getAlbumName() {
         return albumName;
+    }
+    
+    public File getAlbumArt() {
+        return albumArt;
     }
 
     public void setmp3Location(File location) {
@@ -141,5 +161,21 @@ public class Song
         } else { // else it wasn't found
             System.out.println(n + " " + a + " JSON not found.");
         }
+    }
+
+    String getMP3Location() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    // this converts our albumArt file into a JavaFX Image
+    public Image albumArtToJFX()
+    {
+        FileInputStream input = null;
+        try {
+            input = new FileInputStream(this.albumArt.getAbsolutePath());
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Song.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return new Image(input);
     }
 }

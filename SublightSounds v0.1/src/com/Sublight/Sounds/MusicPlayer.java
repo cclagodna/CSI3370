@@ -26,7 +26,7 @@ public class MusicPlayer {
     public final String p = System.getProperty("file.separator");
     //Path to the song folder, could be removed?
     private final String pathToSongFolder = "resources" + p + "Songs";
-    //File object of the song folder, could be reomved?
+    //File object of the song folder, could be removed?
     private final File songFolder = new File(pathToSongFolder);
     //ArrayList of songs in song folder, could be removed?
     ArrayList<File> files = new ArrayList(Arrays.asList(songFolder.listFiles()));
@@ -44,6 +44,8 @@ public class MusicPlayer {
     private Media media;
     //Create object that will actually play loaded song, must be passed Media object
     private MediaPlayer player;
+    // current playlist the MusicPlayer is using
+    private Playlist currentPlaylist;
     
     //CONSTRUCTORS #####################################################
     
@@ -81,7 +83,24 @@ public class MusicPlayer {
                 updateMusicPlayer(files.get(0));
             }
         }
-        
+    }
+    
+    //Iterates music player to previous song, or loops to last song in case of being at beginning of list
+    //TODO: Should also be able to choose songs based on current playlist
+    public void prevSong() {
+        //If song folder has current song (should always be true)
+        //TODO: Needs to have option to check current playlist
+        if (files.contains(getSong())) {
+            int i = files.indexOf(getSong());
+            //If there are more songs in folder (or playlist), go to prev song
+            if (i - 1 >= 0) {
+                updateMusicPlayer(files.get(i-1));
+            }
+            //If current song is first song in list, go to last song in folder
+            else {
+                updateMusicPlayer(files.get(files.size() - 1));
+            }
+        }
     }
     
     //Loads a default song into MediaPlay
@@ -218,6 +237,17 @@ public class MusicPlayer {
     
     public void setPlayer(MediaPlayer mp) {
         this.player = mp;
+    }
+    
+    
+    // currentPlaylist getter
+    public Playlist getCurrentPlaylist() {
+        return currentPlaylist;
+    }
+    
+    // currentPlaylist setter
+    public void setCurrentPlaylist(Playlist p) {
+        this.currentPlaylist = p;
     }
     
     

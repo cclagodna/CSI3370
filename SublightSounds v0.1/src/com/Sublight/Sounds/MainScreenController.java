@@ -10,23 +10,27 @@ import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.NotSupportedException;
 import com.mpatric.mp3agic.UnsupportedTagException;
-import com.sun.javafx.property.adapter.PropertyDescriptor;
-import com.sun.javafx.property.adapter.PropertyDescriptor.Listener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
-import javafx.scene.media.MediaPlayer;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.media.MediaPlayer.Status;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Duration;
@@ -44,7 +48,9 @@ public class MainScreenController implements Initializable {
     public String p = System.getProperty("file.separator"); 
     public static MusicPlayer mp;
     
-    public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>();
+    public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>(); // an arraylist of all playlists in our program
+    public Playlist selectedPlaylist; // selected playlist based off of what's selected in playlist ListView
+    public Song selectedSong; // selected song based off of what's selected in song ListView
     
     @FXML
     private TextField uploadText;
@@ -65,7 +71,28 @@ public class MainScreenController implements Initializable {
     @FXML
     private Slider timeSlider;
     @FXML
-    private Button btnSkip;
+    private Button btnPlayPause;
+    @FXML
+    private Button btnSkipForward;
+    @FXML
+    private Button btnSkipBackward;
+    @FXML
+    private ImageView volumeIcon;
+    @FXML
+    private TextField albumArtText;
+    @FXML
+    private ListView<String> playlistView;
+    @FXML
+    private Label playlistViewLabel;
+    @FXML
+    private ListView<String> songView;
+    @FXML
+    private Label songViewLabel;
+    @FXML
+    private TextFlow songInfo;
+    @FXML
+    private ImageView albumArtView;
+    
     
     /**
      * Initializes the controller class.
@@ -88,9 +115,17 @@ public class MainScreenController implements Initializable {
 
     //Create VolumeSlider object, allowing the user to control the output volume of the player
     private void initializeVolumeSlider() {
-        volumeSlider.setValue(mp.getPlayer().getVolume() *100);
+        volumeSlider.setValue(mp.getPlayer().getVolume() * 100);
         volumeSlider.valueProperty().addListener((Observable o) -> {
             mp.getPlayer().setVolume(volumeSlider.getValue() /100);
+            
+            //Change volume icon based on value of volumeSlider
+            //Three levels: loud, quiet, mute
+            //Remove all icons, then add the specefic one based on volume
+            volumeIcon.getStyleClass().removeAll("volume-bar-mute", "volume-bar-quiet", "volume-bar-loud");
+            if (volumeSlider.getValue() <= 0) volumeIcon.getStyleClass().add("volume-bar-mute");
+            else if (volumeSlider.getValue() <= 50) volumeIcon.getStyleClass().add("volume-bar-quiet");
+            else volumeIcon.getStyleClass().add("volume-bar-loud");
         });
     }
     
@@ -121,22 +156,36 @@ public class MainScreenController implements Initializable {
     
     //TODO Add a button that runs this code
     @FXML
-    private void btnSkipSong(ActionEvent event) {
+    private void btnSkipForwardClicked(ActionEvent event) {
         //Stops current song, then plays the next one
         btnStopClicked(event);
         mp.nextSong();
     }
     
-    // this is the function for the play button
     @FXML
-    private void btnPlayClicked(ActionEvent event) {
-       mp.getPlayer().play();
+    private void btnSkipBackwardClicked(ActionEvent event) {
+        //Stops current song, then plays the next one
+        btnStopClicked(event);
+        mp.prevSong();
     }
     
-    // this is the function for the pause button
+    //Play / pause button functionality
     @FXML
-    private void btnPauseClicked(ActionEvent event) {
-        mp.getPlayer().pause();
+    private void btnPlayPauseClicked(ActionEvent event) {
+        //If song is already playing, pause it
+        if (mp.getPlayer().getStatus() == Status.PLAYING) {
+            mp.getPlayer().pause();
+            //Change style to show a play button while song is paused
+            btnPlayPause.getStyleClass().remove("pause-button");
+            btnPlayPause.getStyleClass().add("play-button");
+        }
+        //If song is paused, play it
+        else {
+            mp.getPlayer().play();
+            //Change style to show a pause button while song is playing
+            btnPlayPause.getStyleClass().remove("play-button");
+            btnPlayPause.getStyleClass().add("pause-button");
+        }
     }
 
     // this is the function for the stop button
@@ -158,56 +207,39 @@ public class MainScreenController implements Initializable {
         }
     }
     
+    // function for select album art button
+    @FXML
+    void btnSelectAlbumArtClicked(ActionEvent event) 
+    {
+        File f = Helpers.imageFileChooser();
+        if (f != null) {
+            albumArtText.setText(f.getAbsolutePath());
+        }
+    }
+    
     // this is the function for the upload button
     @FXML
-    void btnUploadClicked(ActionEvent event) throws IOException, UnsupportedTagException, InvalidDataException, NotSupportedException {
-        //Get file uploaded thru btnSelectMP3Clicked
-        File f = new File(uploadText.getText());
-        //Get information in text boxes inputted by user
+    void btnUploadClicked(ActionEvent event) 
+    {
+        File mp3File = new File(uploadText.getText());
         String sName = songNameText.getText();
         String artistName = artistNameText.getText();
         String albumName = albumNameText.getText();
-        
-        //Create new mp3 and tag
-        Mp3File mp3 = new Mp3File(f);
-        ID3v2 tag;
-        
-        //Remove id3v1 and Custom tags, as we want to tag with just id3v2 (3v2 supports images)
-        //Unsure why this is, creator of mp3agic says this may prevent errors
-        //May be removed if no errors arise, or undesired behavior arises
-        if ( mp3.hasId3v1Tag() ) mp3.removeId3v1Tag();
-        if ( mp3.hasCustomTag() ) mp3.removeCustomTag();
-        //If mp3 already has an id3v2 tag, retrieve it. If not, make a new id3v2 instance
-        //Creating a new id3v2 tag must call class ID3v24Tag, unsure why
-        tag = ( mp3.hasId3v2Tag() ) ? mp3.getId3v2Tag() : new ID3v24Tag();
-        
-        //Put user inputted parameters into mp3 id3v2 tag (ie metadata)
-        tag.setTitle(sName);
-        tag.setArtist(artistName);
-        tag.setAlbum(albumName);
-        //Set id3v2 tag to mp3
-        mp3.setId3v2Tag(tag);
-        
-        //Get path of original file
-        String path = f.getAbsolutePath();
-        //Create placeholder pathname
-        String tempPath = path + ".placeholder";
-        
-        //Save mp3 using placeholder path
-        //Mp3agic can't overwrite into a path/ file with same name
-        //Must use File class operations
-        mp3.save(tempPath);
-        
-        //Create new File using tempory path name
-        File newf = new File(tempPath);
-        //Delete original file
-        f.delete();
-        //Rename new file with updated id3v2 tags to old file name (essentially replacing it)
-        newf.renameTo(f);
-        //Actually upload the file to default directory (Resources/Songs)
-        Helpers.uploadFile(f);
-        //Set label to status of upload
-        uploadMP3Label.setText(Helpers.getUploadStatus());
+        Song s;
+        // this checks if there's already album art found for the specified artist & album
+        File albumArtFile = Helpers.checkForAlbumCover(sName, artistName);
+        if (albumArtFile != null) {
+            s = new Song(mp3File, sName, artistName, albumName, albumArtFile);
+        } 
+        else if (albumArtText.getText() != null) // else if there's no album art found in program
+        {
+            File art = new File(albumArtText.getText());
+            s = new Song(mp3File, sName, artistName, albumName, art);
+        } 
+        else { // else there's no album art provided
+            s = new Song(mp3File, sName, artistName, albumName);
+        }        
+        uploadMP3Label.setText(Helpers.uploadCheck(s));
     }
     
     // Result: Broken. loadPlaylists() needs to be fixed (Paths.get(filepath))
@@ -249,7 +281,6 @@ public class MainScreenController implements Initializable {
         return returner;
     }
     
-    
     public Duration getDuration() {
         return mp.getMedia().getDuration();
     }
@@ -258,10 +289,82 @@ public class MainScreenController implements Initializable {
         return mp.getPlayer().getCurrentTime();
     }
     
-    
-    public void getListener() {
-        mp.getPlayer().currentTimeProperty().addListener((Observable o) -> {
-            this.updateTimeValues();
+    // initializes the playlistView ListView with all playlists stored in the program.
+    public void playlistViewInitializer() 
+    {
+        ArrayList<String> playlistNames = new ArrayList<String>();
+        for (Playlist p : allPlaylists) {
+            playlistNames.add(p.getName());
+        }
+        playlistView.getItems().addAll(playlistNames); // add playlist names to playlist ListView
+        // adding a listener that updates selectedPlaylist when selection is changed
+        playlistView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() 
+        {
+            @Override
+            public void changed(ObservableValue<? extends String> ov, String t, String t1) 
+            {
+                selectedPlaylist = allPlaylists.get(playlistView.getSelectionModel().getSelectedIndex());
+                mp.setCurrentPlaylist(selectedPlaylist);
+                playlistViewLabel.setText("Selected Playlist: " + selectedPlaylist.getName());
+                // update the songs ListView based on the given playlist
+                songViewInitializer();
+            }
         });
+    }
+    
+    // this shows all the songs in the selected Playlist.
+    public void songViewInitializer() 
+    {
+        // clear the songView ListView if there's already stuff in there
+        if (songView.getItems() != null) {
+            songView.getItems().clear();
+        }
+        ArrayList<String> songNames = new ArrayList<String>();
+        for (Song s: selectedPlaylist.getPlaylist()) {
+            songNames.add(s.getSongName());
+        }
+        songView.getItems().addAll(songNames);
+        songView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() 
+        {
+            @Override
+            public void changed(ObservableValue<? extends String> ov, String t, String t1) 
+            {
+                // this if statement is here in-case we select something from the playlistView
+                if (songView.getSelectionModel().getSelectedIndex() >= 0) 
+                {
+                    selectedSong = selectedPlaylist.getPlaylist().get(songView.getSelectionModel().getSelectedIndex());
+                    songViewLabel.setText("Selected Song: " + selectedSong.getSongName());
+                } else { // this is to accomodate when switching back to playlist ListView
+                    selectedSong = null;
+                    songViewLabel.setText("Selected Song: N/A");
+                }
+            }
+        });
+    }
+    
+    // this should put the songs Metadata into a TextFlow object
+    public void songInfoInitializer(Song s) 
+    {
+        Text songName = new Text("Song Name: " + s.getSongName());
+        Text artistName = new Text("Artist Name: " + s.getArtistName());
+        Text albumName = new Text("Album Name: " + s.getAlbumName());
+        songInfo = new TextFlow(songName, artistName, albumName);
+        songInfo.setLineSpacing(2.0);
+    }
+    
+    // this makes it so album art appears in an ImageView if there's album art associated with provided song
+    public void albumArtInitializer(Song s)
+    {
+        if (s.getAlbumArt() != null) 
+        {
+            Image albumImage = s.albumArtToJFX();
+            albumArtView.setImage(albumImage);
+            albumArtView.setPreserveRatio(true);
+        }
+        else if ((albumArtView.getImage() != null) &&
+                  !(s.getAlbumArt() != null)) 
+        {
+            albumArtView.setImage(null);
+        }
     }
 }
