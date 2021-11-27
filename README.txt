@@ -1,3 +1,11 @@
+-------------------------------------------------------------------------------------------------
+2021/11/27
+Most changes here are merging all our separate branches together
+So far, Gabe's and Connor's are in, with some minor changes here and there
+Roger's branch is mostly in, but I have some trouble with album art and hoking his stuff up to the UI
+-------------------------------------------------------------------------------------------------
+
+
 Carl  LaGodna
 UPDATE LOG
 -------------------------------------------------------------------------------------------------
