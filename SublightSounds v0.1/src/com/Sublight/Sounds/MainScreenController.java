@@ -92,7 +92,7 @@ public class MainScreenController implements Initializable {
     private TextFlow songInfo;
     @FXML
     private ImageView albumArtView;
-    
+
     
     /**
      * Initializes the controller class.
@@ -157,6 +157,28 @@ public class MainScreenController implements Initializable {
     //TODO Add a button that runs this code
     @FXML
     private void btnSkipForwardClicked(ActionEvent event) {
+        //Initialize MediaPlayer object with a base song
+        //musicPlayer = new MusicPlayer("resources" + p + "rickroll.mp3");
+        mp = new MusicPlayer();
+        //mp = musicPlayer.getMediaPlayer();
+        
+        uploadText.setEditable(false);
+        
+        //Create VolumeSlider object, allowing the user to control the output volume of the player
+        volumeSlider.setValue(mp.getPlayer().getVolume() *100);
+        volumeSlider.valueProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable o) {
+                mp.getPlayer().setVolume(volumeSlider.getValue() /100);
+                  } 
+       });
+        
+    }    
+
+    
+    //TODO Add a button that runs this code
+    @FXML
+    private void btnSkipSong(ActionEvent event) {
         //Stops current song, then plays the next one
         btnStopClicked(event);
         mp.nextSong();

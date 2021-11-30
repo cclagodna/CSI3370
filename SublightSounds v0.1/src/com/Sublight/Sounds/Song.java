@@ -71,7 +71,7 @@ public class Song
     public Song(File location, String song, String artist, String album, File image) 
     {
         this.mp3Location = location;
-        this.songName = song;
+        this.songName = name;
         this.artistName = artist;
         this.albumName = album;
         this.albumArt = image;

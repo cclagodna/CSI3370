@@ -26,7 +26,6 @@ public class MusicPlayer {
     public final String p = System.getProperty("file.separator");
     //Path to the song folder, could be removed?
     private final String pathToSongFolder = "resources" + p + "Songs";
-    //File object of the song folder, could be removed?
     private final File songFolder = new File(pathToSongFolder);
     //ArrayList of songs in song folder, could be removed?
     ArrayList<File> files = new ArrayList(Arrays.asList(songFolder.listFiles()));
@@ -101,6 +100,7 @@ public class MusicPlayer {
                 updateMusicPlayer(files.get(files.size() - 1));
             }
         }
+
     }
     
     //Loads a default song into MediaPlay
