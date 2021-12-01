@@ -118,7 +118,7 @@ public class Playlist {
             {
                 for (Song s : playlist) // for all songs in the playlist
                 {
-                    String songPath = Song.getJSONLocation(s).getPath(); // get it's JSON file location
+                    String songPath = s.getJSONLocation().getPath(); // get its JSON file location
                     //fr.write(songPath + "\n"); // add it to this text file
                     fr.write(songPath + System.getProperty("line.separator"));
                 }
