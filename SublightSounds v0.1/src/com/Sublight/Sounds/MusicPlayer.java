@@ -3,11 +3,16 @@
  */
 package com.Sublight.Sounds;
 
+import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
@@ -25,20 +30,22 @@ public class MusicPlayer {
     //OS's have different file separators, this gets the one for users device
     public final String p = System.getProperty("file.separator");
     //Path to the song folder, could be removed?
-    private final String pathToSongFolder = "resources" + p + "Songs";
-    private final File songFolder = new File(pathToSongFolder);
-    //ArrayList of songs in song folder, could be removed?
-    ArrayList<File> files = new ArrayList(Arrays.asList(songFolder.listFiles()));
-    //The current song file the MediaPlayer is playing
-    private File currSong;
+    private final String pathToSongJSONFolder = "Resources" + p + "SongJSONs";
+    //File object of the song folder, could be removed?
+    private final File songFolder = new File(pathToSongJSONFolder);
+    //List of all song JSONs, will be iterated over to change currSong
+    ArrayList<File> jsonFiles = new ArrayList(Arrays.asList(songFolder.listFiles()));
+    //File of current Json holding information about current song
+    //The Json will hold all metadata info and path to mp3
+    private File currJson;
+    //Song class loaded with information contained in JSON
+    private Song currSong;
     //Get file holding all playlists
-    private final File playlistFolder = new File("resources" + p + "Playlists");
+    private final File playlistFolder = new File("Resources" + p + "Playlists");
     //ArrayList of playlists in playlist folder, could be removed?
     ArrayList<File> playlists = new ArrayList(Arrays.asList(playlistFolder.listFiles()));
     //Current playlist the MediaPlayer is iterating over
     private Playlist currPlaylist;
-    //String designating file path of currSong. Will only update in setSong()
-    private String path;
     //Media object, must get passed a file location (as String)
     private Media media;
     //Create object that will actually play loaded song, must be passed Media object
@@ -49,18 +56,20 @@ public class MusicPlayer {
     //CONSTRUCTORS #####################################################
     
     //If a file isn't specified, must retrieve a song to initialize with
-    public MusicPlayer() {
+    public MusicPlayer() throws FileNotFoundException {
         setDefaultSong();
-        setPath();
-        setMedia();
-        setPlayer();
+        // So mediaPlayer doesn't immediately play when program opened
+        player.pause();
     }
     
-    public MusicPlayer(String pathname) {
-        setSong(pathname);
-        setPath();
-        setMedia();
-        setPlayer();
+    public MusicPlayer(String pathname) throws FileNotFoundException {
+        this.updateMusicPlayer(new File(pathname));
+    }
+    
+    public MusicPlayer(File file) throws FileNotFoundException {
+        updateMusicPlayer(file);
+        // So mediaPlayer doesn't immediately play when program opened
+        player.pause();
     }
     
     //CONSTRUCTORS #####################################################
@@ -68,67 +77,80 @@ public class MusicPlayer {
     
     //Iterates music player to next song, or loops to first song in case of being at end of list
     //TODO: Should also be able to choose songs based on current playlist
-    public void nextSong() {
-        //If song folder has current song (should always be true)
+    public void nextSong() throws FileNotFoundException {
+        //If json folder has current song json(should always be true)
+        //This if statement is mostly for playlists, whenever they'll be implemented
         //TODO: Needs to have option to check current playlist
-        if (files.contains(getSong())) {
-            int i = files.indexOf(getSong());
+        if (jsonFiles.contains(currJson)) {
+            int i = jsonFiles.indexOf(currJson);
+
             //If there are more songs in folder (or playlist), go to next song
-            if (i + 1 < files.size()) {
-                updateMusicPlayer(files.get(i+1));
+            if (i + 1 < jsonFiles.size()) {
+                updateMusicPlayer(jsonFiles.get(i+1));
             }
             //If current song is last song in list, go to first song in folder
             else {
-                updateMusicPlayer(files.get(0));
+                updateMusicPlayer(jsonFiles.get(0));
             }
         }
     }
     
     //Iterates music player to previous song, or loops to last song in case of being at beginning of list
     //TODO: Should also be able to choose songs based on current playlist
-    public void prevSong() {
-        //If song folder has current song (should always be true)
+    public void prevSong() throws FileNotFoundException {
+        //If json folder has current song json(should always be true)
+        //This if statement is mostly for playlists, whenever they'll be implemented
         //TODO: Needs to have option to check current playlist
-        if (files.contains(getSong())) {
-            int i = files.indexOf(getSong());
+        if (jsonFiles.contains(currJson)) {
+            int i = jsonFiles.indexOf(currJson);
             //If there are more songs in folder (or playlist), go to prev song
             if (i - 1 >= 0) {
-                updateMusicPlayer(files.get(i-1));
+                updateMusicPlayer(jsonFiles.get(i-1));
             }
             //If current song is first song in list, go to last song in folder
             else {
-                updateMusicPlayer(files.get(files.size() - 1));
+                updateMusicPlayer(jsonFiles.get(jsonFiles.size() - 1));
             }
         }
-
     }
     
     //Loads a default song into MediaPlay
     //Used for when a file isn't specified at moment of construction
-    public void setDefaultSong() {
+    private void setDefaultSong() throws FileNotFoundException {
+        if(jsonFiles.isEmpty()) {
+            System.out.println("No songs found!");
+            return;
+        }
         //Create ArrayList of all songs in SongFolder
-        for (File f : files) {
-            System.out.println(f.getName());
+        for (File j : jsonFiles) {
+            System.out.println(j.getName());
         }
-        //If 'files' is not empty
-        if (!files.isEmpty()) {
-            //Set the song path to the first file in songFolder
-            setSong(files.get(0));
-        }
-        //Print confirmation message to console
-        System.out.printf("Successfully loaded song: %s%n", currSong.getName());
+        //Update musicPlayer to have the new song
+        updateMusicPlayer(jsonFiles.get(0));
     }
     
     //When setting a new song, updates all respective fields (path, media, mediaPlayer, etc)
     //Only the current song can be updated directly, this function handles setting other fields
-    public void updateMusicPlayer(File f) {
-        this.currSong = f;
-        setPath();
+    private void updateMusicPlayer(File f) throws FileNotFoundException {
+        setSong(f);
         //New media object must be set before a new mediaPlayer
         setMedia();
         setPlayer();
         //Print confirmation message to console
-        System.out.printf("Successfully loaded song: %s%n", currSong.getName());
+        System.out.printf("Successfully loaded song: %s%n", currSong.getmp3Location());
+        //Sets the musicPlayer to PLAY
+        //This may cause unintentional behavior
+        //However, since the player is likely playing when going to the next song, should be fine...
+        getPlayer().play();
+    }
+    
+    public void updateMusicPlayer(Song s) throws FileNotFoundException {
+        setSong(s);
+        //New media object must be set before a new mediaPlayer
+        setMedia();
+        setPlayer();
+        //Print confirmation message to console
+        System.out.printf("Successfully loaded song: %s%n", currSong.getmp3Location());
         //Sets the musicPlayer to PLAY
         //This may cause unintentional behavior
         //However, since the player is likely playing when going to the next song, should be fine...
@@ -139,48 +161,33 @@ public class MusicPlayer {
     //GET AND SET ######################################################
         //These get and set methods could be organized better (alphabetical?)
     
-    //Sets the player to a new song
+    //Sets a new song into the mediaPlayer
     //Funnels into updateMusicPlayer() function
-    private void setSong(String s) {
-        setSong(new File(s));
+    private void setSong(String s) throws FileNotFoundException {
+        //Extract json into Song class object
+        //Json holds metadata of song, and the mp3 path
+        Gson gson = new Gson();
+        this.currJson = new File(s);
+        this.currSong = gson.fromJson(new FileReader(s), Song.class);
     }
     
-    private void setSong(File f) {
-        this.currSong = f;
+    private void setSong(File f) throws FileNotFoundException {
+        setSong(f.getPath());
     }
     
-    public File getSong() {
+    private void setSong(Song s) throws FileNotFoundException {
+        setSong(s.getmp3Location());
+    }
+    
+    public Song getSong() {
         return currSong;
-    }
-    
-    //Sets path to song
-    //Can only be called in updateMusicPlayer()
-    private void setPath() {
-        this.path = getSong().toURI().toString();
-    }
-    
-    // Returns path to media file
-    public String getPath() {
-        return path;
     }
     
     //Creates media object using new song file
     //Can call this method with a String, File, or Media object
     //Can only be called in updateMusicPlayer()
-    private void setMedia(String s) {
-        this.media = new Media(s);
-    }
-    
-    private void setMedia(File f) {
-        this.media = new Media(f.getName());
-    }
-    
-    private void setMedia(Media newMedia) {
-        this.media = newMedia;
-    }
-    
     private void setMedia() {
-        this.media = new Media(path);
+        this.media = new Media(currSong.getmp3Location().toURI().toString());
     }
     
     // Returns media object
@@ -218,7 +225,13 @@ public class MusicPlayer {
         } catch (Exception e) {
             //This line allows the MediaPlayer to continue to next song in list
             //If this isn't specified, the 'play' button would need to be clicked after every song
-            newPlayer.setOnEndOfMedia(() -> nextSong());
+            newPlayer.setOnEndOfMedia(() -> {
+                try {
+                    nextSong();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(MusicPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            });
         }
         
         
@@ -238,7 +251,6 @@ public class MusicPlayer {
     public void setPlayer(MediaPlayer mp) {
         this.player = mp;
     }
-    
     
     // currentPlaylist getter
     public Playlist getCurrentPlaylist() {

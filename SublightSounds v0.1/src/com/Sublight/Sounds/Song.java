@@ -29,6 +29,8 @@ public class Song
     //File separator character, dependent on end-user's system
     public static String p = System.getProperty("file.separator");
    
+    public Gson a;
+    
     //File containing mp3
     private File mp3Location;
     //Song name
@@ -71,7 +73,7 @@ public class Song
     public Song(File location, String song, String artist, String album, File image) 
     {
         this.mp3Location = location;
-        this.songName = name;
+        this.songName = song;
         this.artistName = artist;
         this.albumName = album;
         this.albumArt = image;
@@ -79,8 +81,14 @@ public class Song
     
     //CONSTRUCTORS #####################################################
 
+    // Returns file object of mp3
     public File getmp3Location() {
         return mp3Location;
+    }
+    
+    // Returns file location as a string
+    public String getName() {
+        return getmp3Location().getName();
     }
 
     public String getSongName() {
@@ -120,10 +128,11 @@ public class Song
         return f.exists();
     }
     
+    
     // getting the location of the JSON file
-    public static File getJSONLocation(Song s) {
-        String n = s.songName;
-        String a = s.artistName;
+    public File getJSONLocation() {
+        String n = getSongName();
+        String a = getArtistName();
         File f = new File("resources" + p + "SongJSONs" + p + n + "+" + a + ".json"); // specifying where file is stored
         return f;
     }
@@ -131,7 +140,7 @@ public class Song
     // This creates a JSON file with the name "(NameofSong)+(NameofArtist).json"
     public void createJSONFile(Song s)
     {
-        File f = Song.getJSONLocation(s); // getting file location of JSON
+        File f = getJSONLocation(); // getting file location of JSON
         Gson gson = new Gson(); // creating a GSON object
         try (FileWriter writer = new FileWriter(f.getPath())) 
         {
@@ -145,7 +154,7 @@ public class Song
     public void removeSongFiles(Song s) 
     {
         File mp3File = s.getmp3Location().getAbsoluteFile();
-        File jsonFile = Song.getJSONLocation(s).getAbsoluteFile();
+        File jsonFile = getJSONLocation().getAbsoluteFile();
         String n = s.getSongName();
         String a = s.getArtistName();
         if (mp3File.exists()) // if the mp3 file exists, delete it

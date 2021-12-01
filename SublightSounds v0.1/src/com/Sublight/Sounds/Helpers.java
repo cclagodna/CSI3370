@@ -25,7 +25,7 @@ public class Helpers
     public final static String p = System.getProperty("file.separator");
     public static String songResourcePath = "Resources" + p + "Songs" + p;
     public static String uploadSongPath = "resources" + p + "Songs" + p;
-    public static String uploadImagePath = "resources" + p + "Albums" + p;
+    public static String uploadImagePath = "resources" + p + "AlbumArt" + p;
     //Stores message about the status of upload functionality
     static String uploadStatus = "";
     
@@ -74,7 +74,7 @@ public class Helpers
                             File existingAlbumArt = Helpers.checkForAlbumCover(artistName, albumName);
                             temp = new Song(newFileLoc, sName, artistName, albumName, existingAlbumArt);
                             temp.createJSONFile(temp);
-                            System.out.println("Album Art already detected.");
+                            System.out.println("Album already detected.");
                         }
                         else if (image != null) 
                         {
@@ -170,7 +170,7 @@ public class Helpers
     public static File checkForAlbumCover(String artist, String album) 
     {
         File value = null;
-        File f = new File("resources" + p + "Albums");
+        File f = new File("resources" + p + "AlbumArt");
         if (f.exists() && f.isDirectory()) 
         {
             if (f.length() > 0) // getting the files of the playlist folder (minus DS_Store files)
@@ -192,7 +192,7 @@ public class Helpers
                 }
             }
         } else {
-            System.out.println("Albums directory not found, cannot check album covers.");
+            System.out.println("AlbumArt directory not found, cannot check album covers.");
         }
         return value;
     }

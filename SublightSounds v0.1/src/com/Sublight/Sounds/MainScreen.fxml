@@ -25,11 +25,11 @@
          <children>
             <SplitPane layoutX="301.0" layoutY="-1.0" orientation="VERTICAL" prefHeight="701.0" prefWidth="668.0">
               <items>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="732.0" prefWidth="721.0" style="-fx-border-color: black;" styleClass="mainPane" stylesheets="@soundsStyle.css">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="732.0" prefWidth="721.0" style="-fx-border-color: black" styleClass="mainPane" stylesheets="@soundsStyle.css">
                      <children>
                         <ImageView fitHeight="199.0" fitWidth="191.0" layoutX="477.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../../../resources/Album%20covers/Supertramp.jpg" />
+                              <Image url="@../../../../../resources/AlbumArt/Supertramp.jpg" />
                            </image>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -40,7 +40,7 @@
                         </ImageView>
                         <ImageView fitHeight="199.0" fitWidth="201.0" layoutX="361.0" layoutY="75.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../../../resources/Album%20covers/Chuck_Mangione,_Feels_So_Good_(1977).png" />
+                              <Image url="@../../../../../resources/AlbumArt/Chuck_Mangione,_Feels_So_Good_(1977).png" />
                            </image>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -51,7 +51,7 @@
                         </ImageView>
                         <ImageView fitHeight="208.0" fitWidth="218.0" layoutX="222.0" layoutY="67.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../../../resources/Album%20covers/PB.jpg" />
+                              <Image url="@../../../../../resources/AlbumArt/PB.jpg" />
                            </image>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -62,7 +62,7 @@
                         </ImageView>
                         <ImageView fitHeight="218.0" fitWidth="228.0" layoutX="72.0" layoutY="56.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../../../../../resources/Album%20covers/The%20clash.jpg" />
+                              <Image url="@../../../../../resources/AlbumArt/The%20clash.jpg" />
                            </image>
                            <cursor>
                               <Cursor fx:constant="HAND" />
@@ -76,7 +76,7 @@
                               <Font size="28.0" />
                            </font>
                         </Label>
-                      <AnchorPane layoutX="-4.0" layoutY="600.0" minHeight="0.0" minWidth="0.0" prefHeight="109.0" prefWidth="729.0" styleClass="sidebar" stylesheets="@soundsStyle.css">
+                      <AnchorPane layoutX="-4.0" layoutY="600" minHeight="0.0" minWidth="0.0" prefHeight="109.0" prefWidth="729.0" styleClass="sidebar" stylesheets="@soundsStyle.css">
                            <children>
                               <ImageView fx:id="volumeIcon" fitHeight="30.0" fitWidth="30.0" layoutX="437.0" layoutY="33.0" pickOnBounds="true" smooth="false">
                                  <styleClass>
@@ -152,17 +152,20 @@
                               <Label fx:id="totalTimeDisplay" layoutX="272.0" layoutY="17.0" text="Label" textFill="WHITE" stylesheets="@soundsStyle.css"/>
                            </children>
                         </AnchorPane>
-                        <Pane layoutY="326.0" prefHeight="274.0" prefWidth="721.0">
+                        <Pane layoutX="20" layoutY="324.0" prefHeight="274.0" prefWidth="721.0">
                            <children>
-                              <ImageView fx:id="albumArtView" fitHeight="274.0" fitWidth="278.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="albumArtView" fitHeight="260" fitWidth="260" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../../../../resources/Album%20covers/beck_-_hyperspace.jpg" />
+                                    <Image url="@../../../../../resources/AlbumArt/beck_-_hyperspace.jpg" />
                                  </image>
                                  <cursor>
                                     <Cursor fx:constant="HAND" />
                                  </cursor>
+                                 <effect>
+                                    <Reflection topOpacity="0.50" fraction="0.06"/>
+                                 </effect>
                               </ImageView>
-                              <ListView layoutX="275.0" prefHeight="274.0" prefWidth="392.0" styleClass="mainPane" stylesheets="@soundsStyle.css" />
+                              <ListView layoutX="275.0" prefHeight="274.0" prefWidth="392.0" style="-fx-background-color: black" styleClass="mainPane" stylesheets="@soundsStyle.css" />
                            </children>
                         </Pane>
                      </children>

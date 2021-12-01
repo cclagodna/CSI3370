@@ -11,10 +11,13 @@ import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.NotSupportedException;
 import com.mpatric.mp3agic.UnsupportedTagException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -47,6 +50,8 @@ public class MainScreenController implements Initializable {
     */
     public String p = System.getProperty("file.separator"); 
     public static MusicPlayer mp;
+    private final File defaultAlbumArtPath = new File("Resources" + p + "AlbumArt" + p + "default.png");
+    public final Image defaultAlbumArt = new Image(defaultAlbumArtPath.getAbsolutePath());
     
     public ArrayList<Playlist> allPlaylists = new ArrayList<Playlist>(); // an arraylist of all playlists in our program
     public Playlist selectedPlaylist; // selected playlist based off of what's selected in playlist ListView
@@ -92,7 +97,7 @@ public class MainScreenController implements Initializable {
     private TextFlow songInfo;
     @FXML
     private ImageView albumArtView;
-
+    
     
     /**
      * Initializes the controller class.
@@ -102,13 +107,31 @@ public class MainScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //Initialize MediaPlayer object
-        mp = new MusicPlayer();
+        try {
+            mp = new MusicPlayer();
+        }
+        catch (FileNotFoundException ex) {
+            Logger.getLogger(MainScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        //Add these functions to the music palyer
+        mp.getPlayer().setOnReady(() -> {
+            //This will allow the time slider to go along with each song, even after making a new mediaPlayer
+            //Without this, the time bar would only move along with the first song
+            //This is a very hack-y way of going abou this, but a better solution counld not be found
+            initializeTimeSlider();
+            updateTimeValues();
+            updateAlbumArt();
+        });
         
         uploadText.setEditable(false);
         
         initializeVolumeSlider();
         
         initializeTimeSlider();
+        
+        updateAlbumArt();
         
         updateTimeValues();
     }    
@@ -136,14 +159,7 @@ public class MainScreenController implements Initializable {
             updateTimeValues();
         });
         
-        // get duration of current song so it can be displayed
-        mp.getPlayer().setOnReady(() -> {
-            //This will allow the time slider to go along with each song, even after making a new mediaPlayer
-            //Without this, the time bar would only move along with the first song
-            //This is a very hack-y way of going abou this, but a better solution counld not be found
-            initializeTimeSlider();
-            updateTimeValues();
-        });
+        
         
         //make scrubbing possible for timeSlider
         timeSlider.valueProperty().addListener((Observable o) -> {
@@ -154,38 +170,29 @@ public class MainScreenController implements Initializable {
         
     }
     
-    //TODO Add a button that runs this code
     @FXML
-    private void btnSkipForwardClicked(ActionEvent event) {
-        //Initialize MediaPlayer object with a base song
-        //musicPlayer = new MusicPlayer("resources" + p + "rickroll.mp3");
-        mp = new MusicPlayer();
-        //mp = musicPlayer.getMediaPlayer();
+    private void updateAlbumArt() {
+        try {
+            albumArtView.setImage(new Image(mp.getSong().getAlbumArt().getAbsolutePath()));
+        }
+        catch (Exception e) {
+            System.out.println("Album art not found! Displaying default.");
+            albumArtView.setImage(defaultAlbumArt);
+        }
         
-        uploadText.setEditable(false);
         
-        //Create VolumeSlider object, allowing the user to control the output volume of the player
-        volumeSlider.setValue(mp.getPlayer().getVolume() *100);
-        volumeSlider.valueProperty().addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable o) {
-                mp.getPlayer().setVolume(volumeSlider.getValue() /100);
-                  } 
-       });
-        
-    }    
-
+    }
     
     //TODO Add a button that runs this code
     @FXML
-    private void btnSkipSong(ActionEvent event) {
+    private void btnSkipForwardClicked(ActionEvent event) throws FileNotFoundException {
         //Stops current song, then plays the next one
         btnStopClicked(event);
         mp.nextSong();
     }
     
     @FXML
-    private void btnSkipBackwardClicked(ActionEvent event) {
+    private void btnSkipBackwardClicked(ActionEvent event) throws FileNotFoundException {
         //Stops current song, then plays the next one
         btnStopClicked(event);
         mp.prevSong();
@@ -244,9 +251,9 @@ public class MainScreenController implements Initializable {
     void btnUploadClicked(ActionEvent event) 
     {
         File mp3File = new File(uploadText.getText());
-        String sName = songNameText.getText();
-        String artistName = artistNameText.getText();
-        String albumName = albumNameText.getText();
+        String sName = songNameText.getText().replace(" ", "_");
+        String artistName = artistNameText.getText().replace(" ", "_");
+        String albumName = albumNameText.getText().replace(" ", "_");
         Song s;
         // this checks if there's already album art found for the specified artist & album
         File albumArtFile = Helpers.checkForAlbumCover(sName, artistName);
